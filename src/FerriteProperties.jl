@@ -1,8 +1,42 @@
+export BHloop, SplInput, SpecificPowerLossData
+export FerriteProperties
+export flux_density, specificpowerloss
+
+
+
+"""julia
+    BHloop(hc,bs,br)
+
+Define the BH loop of a magnetic material.
+
+**Fields**
+- `hc`      -- Coercive force (A-turn/m)
+- `bs`      -- Remnant flux density (Tesla)
+- `br`      -- Saturation flux density (Tesla)
+"""
 immutable BHloop
-  Hc :: Float64
-  Bs :: Float64
-  Br :: Float64
+  hc :: Float64
+  bs :: Float64
+  br :: Float64
 end
+"""julia
+    SpecificPowerLossData(frequency::Tuple, mb::Tuple)
+    SpecificPowerLossData(input::SplInput)
+
+Capture specific power loss data from datasheet.
+
+Data is stored as a series of linear approximations on a log log plot, one for
+each frequency.
+
+**Fields**
+- `frequency`   -- frequency of linear approximation (Hz)
+- `mb`          -- Tuple (slope, offset) defining the approximation
+
+In order to simplify manual data entry, data my also be passed as a SplInput
+  object.  All data is in MKS units (Hz, Tesla, W/m^3).
+"""
+SpecificPowerLossData
+
 immutable SpecificPowerLossData
   frequency :: Tuple  # in Hz
   mb :: Tuple  # y = mx + b
@@ -22,8 +56,22 @@ immutable SpecificPowerLossData
   end
 end
 
-# data input format (f1,(x1,y1),(x2,y2), f2,(x1,y1),(x2,y2))
-# f in Hz, x in mT, y in kW/m^3
+"""julia
+    SplInput(data::Tuple)
+
+Simplify manual input of specific power loss data.
+
+Data format is as follows.
+(f1,(x1,y1),(x2,y2), f2,(x3,y3),(x4,y4), ...)
+
+**Elements of Tuple**
+- `f1`    -- frequency (Hz)
+- `xn`    -- flux density (mT)
+- `yn`    -- specific power loss (Kw/m^3)
+
+The only purpose of this object is to pass to `SpecificPowerLossData`.  Data is
+converted to MKS units there.
+"""
 immutable SplInput
   data :: Tuple
 end
@@ -56,7 +104,6 @@ function interpolate_third_point(x1,y1,x2,y2, x3)
   b = y1-x1*m
   return m*x3+b
 end
-
 function find_nearest_spl_frequency_indices(spl::SpecificPowerLossData,f::Float64)
   i = 2
   for i in 2:length(spl.frequency) # there will never be many of these
@@ -64,6 +111,13 @@ function find_nearest_spl_frequency_indices(spl::SpecificPowerLossData,f::Float6
   end
   return i-1:i
 end
+
+"""julia
+    specificpowerloss(spl::SpecificPowerLossData, flux_density, frequency)
+    specificpowerloss(fp::FerriteProperties, flux_density, frequency)
+
+Returns specific power loss.
+"""
 function specificpowerloss(spl::SpecificPowerLossData, flux_density::Float64, f::Float64)
   # spl = tabulated specific power loss data from graph on datasheet
   # flux_density = magnetic field strength in Tesla
@@ -77,6 +131,19 @@ function specificpowerloss(spl::SpecificPowerLossData, flux_density::Float64, f:
   return pv # specicic power loss (W/m^3) at flux_density, frequency f
 end
 
+"""julia
+    FerriteProperties(frequency_range, troom, thot, bh_room, bh_hot, spl_hot)
+
+Store material data.
+
+**Fields**
+- `frequency_range`   -- range of recomended operating frequency_range
+- `troom`             -- typicaly 25C
+- `thot`              -- typicaly 100C
+- `bh_room`           -- BH loop at room temperature
+- `bh_hot`            -- BH loop at hot temperature
+- `spl_hot`           -- specfic power loss data at hot temperature
+"""
 immutable FerriteProperties
   frequency_range :: FloatRange
   troom :: Float64
@@ -89,6 +156,12 @@ end
 specificpowerloss(fp::FerriteProperties, flux_density::Float64, f::Float64) =
   specificpowerloss(fp.spl_hot,flux_density,f)
 
+"""julia
+    flux_density(spl::SpecificPowerLossData, coreloss, frequency)
+    flux_density(fp::FerriteProperties, coreloss, frequency)
+
+Returns magnetic field strength in Tesla.
+"""
 function flux_density(spl::SpecificPowerLossData, coreloss::Float64, f::Float64)
   # spl = tabulated specific power loss data from graph on datasheet
   # coreloss = specfic power loss at b,f in W/m^3
@@ -106,18 +179,3 @@ function flux_density(spl::SpecificPowerLossData, coreloss::Float64, f::Float64)
 end
 flux_density(fp::FerriteProperties, coreloss::Float64, f::Float64) =
   flux_density(fp.spl_hot,coreloss,f)
-
-
-input_3f3 = SplInput((
-  25e3,(100,14),(300,270),
-  100e3,(62,20,),(240,750),
-  200e3,(38,8),(190,1100),
-  400e3,(20,17),(140,1700),
-  700e3,(12,20),(80,1750)
-  ))
-
-spl_3f3 = SpecificPowerLossData(input_3f3)
-specificpowerloss(spl_3f3,0.06,300e3)*0.001
-frequency = spl_3f3.frequency[3]
-(m,b) = spl_3f3.mb[3]
-m*0.06 +b
