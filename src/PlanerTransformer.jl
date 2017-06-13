@@ -1,5 +1,10 @@
-module PlanerTransformer
+__precompile__()
 
-# package code goes here
+module PlanerTransformer
+include("FerriteProperties.jl")
+include("FerriteData.jl")
+include("CoreGeometry.jl")
+include("CoreData.jl")
+include("TransformerDesign.jl")
 
 end # module
