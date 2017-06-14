@@ -145,7 +145,7 @@ Store material data.
 - `spl_hot`           -- specfic power loss data at hot temperature
 """
 immutable FerriteProperties
-  frequency_range :: FloatRange
+  frequency_range
   troom :: Float64
   thot :: Float64
   bh_room :: BHloop
