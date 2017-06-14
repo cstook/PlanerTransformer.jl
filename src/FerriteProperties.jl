@@ -170,7 +170,6 @@ function flux_density(spl::SpecificPowerLossData, coreloss::Float64, f::Float64)
   indexrange = find_nearest_spl_frequency_indices(spl,f)
   f_array = [spl.frequency[i] for i in indexrange]
   println(f_array)
-  coreloss /= 1000 # convert to kW/m^3
   b_array = [10^((log10(coreloss)-spl.mb[i][1])/spl.mb[i][2]) for i in indexrange]
   println(b_array)
   b = interpolate_third_point(f_array[1],b_array[1],

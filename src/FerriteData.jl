@@ -1,3 +1,4 @@
+export ferrite_dict
 
 # Specific power loss data read off the charts
 # frequency,(x1,y1),(x2,y2)
