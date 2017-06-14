@@ -169,9 +169,7 @@ function flux_density(spl::SpecificPowerLossData, coreloss::Float64, f::Float64)
   # returns magametic field strength in Tesla
   indexrange = find_nearest_spl_frequency_indices(spl,f)
   f_array = [spl.frequency[i] for i in indexrange]
-  println(f_array)
-  b_array = [10^((log10(coreloss)-spl.mb[i][1])/spl.mb[i][2]) for i in indexrange]
-  println(b_array)
+  b_array = [10^((log10(coreloss)-spl.mb[i][2])/spl.mb[i][1]) for i in indexrange]
   b = interpolate_third_point(f_array[1],b_array[1],
                               f_array[2],b_array[2], f)
   return b # magametic field strength in Tesla
