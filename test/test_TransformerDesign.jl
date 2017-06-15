@@ -13,6 +13,6 @@ test_fp = FerriteProperties(0.2e6:0.5e6,25,100,
 test_cg = CoreGeometry(4e-3,     1.5e-3,   5e-3, 300e-9, 14.5e-6, 0.6e-3) # e14
 @test volt_seconds_per_turn(2.0,3.0)≈6.0
 @test volt_seconds_per_turn(test_cg,2.0) ≈ 14.5e-6*2.0
-@test volts_per_turn(test_cg, test_fp, 150e3, 500e3) ≈ 0.6215194243319582
+@test volts_per_turn(test_cg, test_fp, 150e3, 500e3) ≈ 0.6005999150244018
 
 end # testset

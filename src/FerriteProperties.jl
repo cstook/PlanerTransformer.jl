@@ -125,8 +125,8 @@ function specificpowerloss(spl::SpecificPowerLossData, flux_density::Float64, f:
   # retruns specfic power loss at flux_density in Tesla, f in W/m^3
   indexrange = find_nearest_spl_frequency_indices(spl,f)
   f_array = [spl.frequency[i] for i in indexrange]
-  pv_array = [10^(spl.mb[i][1]*log10(flux_density)+spl.mb[i][2]) for i in indexrange]
-  pv = interpolate_third_point(f_array[1],pv_array[1],
+  pv_array = [spl.mb[i][1]*log10(flux_density)+spl.mb[i][2] for i in indexrange]
+  pv = 10^interpolate_third_point(f_array[1],pv_array[1],
                                     f_array[2],pv_array[2], f)
   return pv # specicic power loss (W/m^3) at flux_density, frequency f
 end
@@ -169,8 +169,8 @@ function flux_density(spl::SpecificPowerLossData, coreloss::Float64, f::Float64)
   # returns magametic field strength in Tesla
   indexrange = find_nearest_spl_frequency_indices(spl,f)
   f_array = [spl.frequency[i] for i in indexrange]
-  b_array = [10^((log10(coreloss)-spl.mb[i][2])/spl.mb[i][1]) for i in indexrange]
-  b = interpolate_third_point(f_array[1],b_array[1],
+  b_array = [(log10(coreloss)-spl.mb[i][2])/spl.mb[i][1] for i in indexrange]
+  b = 10^interpolate_third_point(f_array[1],b_array[1],
                               f_array[2],b_array[2], f)
   return b # magametic field strength in Tesla
 end
