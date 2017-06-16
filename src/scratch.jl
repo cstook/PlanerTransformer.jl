@@ -6,8 +6,8 @@ flux2 = flux_density(ferrite_dict["3f4"],coreloss,frequency)
 
 specificpowerloss(ferrite_dict["4f1"],0.01,1e6)
 
-core = :e18
-plate = :plt18
+core = "e14"
+plate = "plt14"
 material = "3f4"
 number_of_turns = 4 # per layer
 trace_edge_gap = 0.16e-3
@@ -17,7 +17,6 @@ loss_limit = 150e3 # W/m^3
 frequency = 1e6 # operating frequency
 flux_density_peak = flux_density(ferrite_dict[material],loss_limit,frequency)
 flux_density_pp = 2*flux_density_peak
-i = 5.0
 vst = volt_seconds_per_turn(core_geometry_dict[core],flux_density_pp)
 vt = volts_per_turn(core_geometry_dict[core],ferrite_dict[material],loss_limit,frequency)
 r = resistance(Winding(core_geometry_dict[core],
@@ -44,9 +43,17 @@ frequency = spl_3f3.frequency[3]
 m*0.06 +b
 
 using PlanerTransformer
+using Plots
 spl = specificpowerloss(ferrite_dict["3f3"],0.02,600e3)
 flux_density(ferrite_dict["3f3"],spl,600e3)
 
+material = ferrite_dict["3f4"]
+spl = 200e3
+f = linspace(material.fmin,material.fmax+1e6,100)
+b = [flux_density(material,spl,x) for x in f]
+bf = b.*f
+plot(f./1e6,bf)
+gui()
 # ER14.5/3/7-3F4-S
 # E14/3.5/5/R-3F4
 # PLT14/5/1.5/S-3F4

@@ -137,7 +137,8 @@ end
 Store material data.
 
 **Fields**
-- `frequency_range`   -- range of recomended operating frequency_range
+- `fmin`              -- minimum recommended operating frequency
+- `fmax`              -- maximum recommended operating frequency
 - `troom`             -- typicaly 25C
 - `thot`              -- typicaly 100C
 - `bh_room`           -- BH loop at room temperature
@@ -145,7 +146,8 @@ Store material data.
 - `spl_hot`           -- specfic power loss data at hot temperature
 """
 immutable FerriteProperties
-  frequency_range
+  fmin :: Float64
+  fmax :: Float64
   troom :: Float64
   thot :: Float64
   bh_room :: BHloop
