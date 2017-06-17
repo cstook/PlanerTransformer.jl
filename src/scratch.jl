@@ -54,6 +54,10 @@ b = [flux_density(material,spl,x) for x in f]
 bf = b.*f
 plot(f./1e6,bf)
 gui()
+
+
+false?1:2
+
 # ER14.5/3/7-3F4-S
 # E14/3.5/5/R-3F4
 # PLT14/5/1.5/S-3F4

@@ -6,7 +6,7 @@ test_spldata = SplInput((
   400e3,(20,17),(140,1700),
   700e3,(12,20),(80,1750)
   ))
-test_fp = FerriteProperties(0.2e6:0.5e6,25,100,
+test_fp = FerriteProperties(0.2e6,0.5e6,25,100,
                             BHloop(15,.44,.15),
                             BHloop(10,.345,.120),
                             SpecificPowerLossData(test_spldata)) # 3f3
