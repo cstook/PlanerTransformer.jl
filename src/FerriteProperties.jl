@@ -178,3 +178,5 @@ function flux_density(spl::SpecificPowerLossData, coreloss::Float64, f::Float64)
 end
 flux_density(fp::FerriteProperties, coreloss::Float64, f::Float64) =
   flux_density(fp.spl_hot,coreloss,f)
+flux_density(m::Magnetics, coreloss::Float64, f::Float64) =
+  flux_density(m.ferriteproperties,coreloss,f)

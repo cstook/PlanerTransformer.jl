@@ -62,19 +62,21 @@ immutable Winding
   pcb :: PCB_Specification
   windinglayers :: Array{WindingLayer,1}
   isseries :: Bool
+  turns :: Int
   function Winding(pcb::PCB_Specification,windinglayers,isseries::Bool)
     if length(windinglayers)==0
       throw(ArgumentError("must have at least one winding"))
     end
-    if ~isseries
-      turns = windinglayers[1].number_of_turns
-      for i in eachindex(windinglayers)
-        if windinglayers[i].number_of_turns != turns
-          throw(ArgumentError("parallel windings must have same number of turns"))
-        end
+    turns_1 = windinglayers[1].number_of_turns
+    turns = turns_1
+    for i in 2:length(windinglayers)
+      truns_i = windinglayers[i].number_of_turns
+      if ~isseries && turns_i != turns_1
+        throw(ArgumentError("parallel windings must have same number of turns"))
       end
+      turns += turns_i
     end
-    new(pcb,windinglayers,isseries)
+    new(pcb,windinglayers,isseries,turns)
   end
 end
 

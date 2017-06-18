@@ -40,7 +40,9 @@ The first form is just an alias for multiply.  The second form pulls the
 volt_seconds_per_turn(effective_area::Float64, flux_density_pp::Float64) =
   effective_area * flux_density_pp
 volt_seconds_per_turn(cg::CoreGeometry, flux_density_pp::Float64) =
-  cg.effective_area * flux_density_pp
+  volt_seconds_per_turn(cg.effective_area, flux_density)
+volt_seconds_per_turn(m::Magnetics, flux_density_pp::Float64) =
+  volt_seconds_per_turn(m.effective_area, flux_density)
 
 """julia
     volts_per_turn(cg::CoreGeometry,
@@ -48,16 +50,30 @@ volt_seconds_per_turn(cg::CoreGeometry, flux_density_pp::Float64) =
 
 Returns the maximum volts per turn.
 """
-function volts_per_turn(cg::CoreGeometry,
-                        fp::FerriteProperties,
+function volts_per_turn(fp::FerriteProperties,
+                        effective_area::Float64,
                         loss_limit::Float64,
                         frequency::Float64)
   flux_density_peak = flux_density(fp,loss_limit,frequency)
   flux_density_pp = 2*flux_density_peak
-  return volt_seconds_per_turn(cg,flux_density_pp) * frequency
+  return volt_seconds_per_turn(effective_area,flux_density_pp) * frequency
 end
+function volts_per_turn(fp::FerriteProperties,
+                        cg::CoreGeometry,
+                        loss_limit::Float64,
+                        frequency::Float64)
+  volts_per_turn(fp,cg.effective_area,loss_limit,frequency)
+end
+volts_per_turn(m::Magnetics, loss_limit::Float64, frequency::Float64) =
+  volts_per_turn(m.ferriteproperties, m.effective_area, loss_limit, frequency)
+volts_per_turn(t::Transformer, loss_limit::Float64, frequency::Float64) =
+  volts_per_turn(t.magnetics.ferriteproperties, t.magnetics.effective_area, loss_limit, frequency)
 
-function volt_seconds(w::Winding,m::Magnetics)
+
+function volts(w::Winding,m::Magnetics,loss_limit::Float64, frequency::Float64)
+  volts_per_turn(m,loss_limit,frequency))*w.turns
 end
-function volt_seconds(t::Transformer)
+function volts(t::Transformer,loss_limit::Float64, frequency::Float64)
+  vpt = volts_per_turn(t,loss_limit,frequency)
+  [vpt*t.windings[i] for in eachindex(t.windings)]
 end
