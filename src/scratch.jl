@@ -55,8 +55,31 @@ bf = b.*f
 plot(f./1e6,bf)
 gui()
 
+using PlanerTransformer
+trace_edge_gap = 0.16e-3
+trace_trace_gap = 0.13e-3
+outer_copper_thickness = copper_weight_to_meters(1.0)
+inner_copper_thickness = copper_weight_to_meters(1.0)
+number_of_layers = 4
+pcb = PCB_Specification(trace_edge_gap,
+                        trace_trace_gap,
+                        outer_copper_thickness,
+                        inner_copper_thickness,
+                        number_of_layers)
 
-false?1:2
+e_core = core_geometry_dict["e14"]
+plate = core_geometry_dict["plt14"]
+material = ferrite_dict["3f4"]
+layer1 = WindingLayer(pcb,true,e_core,3)
+layer2 = WindingLayer(pcb,false,e_core,3)
+layer3 = WindingLayer(pcb,false,e_core,3)
+layer4 = WindingLayer(pcb,true,e_core,3)
+primary = Winding(pcb,[layer1,layer4],false)
+secondary = Winding(pcb,[layer2,layer3],true)
+magnetics = Magnetics(material, [e_core,plate])
+transformer = Transformer(magnetics,[primary,secondary])
+
+
 
 # ER14.5/3/7-3F4-S
 # E14/3.5/5/R-3F4

@@ -60,9 +60,9 @@ end
 
 immutable Winding
   pcb :: PCB_Specification
-  windinglayers :: Array{WindingLayer}
+  windinglayers :: Array{WindingLayer,1}
   isseries :: Bool
-  function Winding(pcb::PCB_Specification,windinglayers::Array{WindingLayer},isseries::Bool)
+  function Winding(pcb::PCB_Specification,windinglayers,isseries::Bool)
     if length(windinglayers)==0
       throw(ArgumentError("must have at least one winding"))
     end
@@ -87,7 +87,7 @@ function resistance(wl::WindingLayer, pcb::PCB_Specification, temperature::Float
   ρ = conductivity(pcb.ρ_20, pcb.temperature_coefficient, temperature)
   resistance(wl,ρ)
 end
-function resistance(w::Winding, temperature)
+function resistance(w::Winding, temperature=100.0)
   x = 0.0
   for i in eachindex(w.windinglayers)
     r = resistance(w.windinglayers[i],w.pcb,temperature)
