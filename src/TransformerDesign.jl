@@ -1,6 +1,6 @@
 export Magnetics, Transformer
 export volt_seconds_per_turn, volts_per_turn, volts
-
+export TransformerPowerDissipation
 
 immutable Magnetics
   ferriteproperties :: FerriteProperties
@@ -26,10 +26,20 @@ end
 immutable Transformer
   magnetics :: Magnetics
   windings :: Array{Winding,1}
+  function Transformer(m::Magnetics,w::Array{Winding,1})
+    if length(w)<2
+      throw(ArgumentError("transformers must have two windings"))
+    end
+    new(m,w)
+  end
 end
 
 flux_density(m::Magnetics, coreloss::Float64, f::Float64) =
   flux_density(m.ferriteproperties,coreloss,f)
+specificpowerloss(m::Magnetics, flux_density::Float64, f::Float64)=
+  specificpowerloss(m.ferriteproperties,flux_density,f)
+specificpowerloss(t::Transformer, flux_density::Float64, f::Float64)=
+  specificpowerloss(t.magnetics,flux_density,f)
 
 """julia
     volt_seconds_per_turn(effective_area, flux_density_pp)
@@ -72,7 +82,6 @@ volts_per_turn(m::Magnetics, loss_limit::Float64, frequency::Float64) =
 volts_per_turn(t::Transformer, loss_limit::Float64, frequency::Float64) =
   volts_per_turn(t.magnetics.ferriteproperties, t.magnetics.effective_area, loss_limit, frequency)
 
-
 function volts(w::Winding,m::Magnetics,loss_limit::Float64, frequency::Float64)
   volts_per_turn(m,loss_limit,frequency)*w.turns
 end
@@ -80,3 +89,49 @@ function volts(t::Transformer,loss_limit::Float64, frequency::Float64)
   vpt = volts_per_turn(t,loss_limit,frequency)
   [vpt*t.windings[i].turns for i in eachindex(t.windings)]
 end
+
+immutable TransformerPowerDissipation
+  transformer :: Transformer
+  frequency :: Float64
+  flux_density ::Float64
+  core_specific_power :: Float64
+  core_total_power :: Float64
+  winding_voltage :: Array{Float64,1}
+  winding_power :: Array{Float64,1}
+  total_power :: Float64
+  function TransformerPowerDissipation(t::Transformer, input::Array{Float64,1}, frequency::Float64)
+    # input = [Vin, Iout, Iout, ...]
+    # first winding is always input
+    if length(t.windings) != length(input)
+      throw(ArgumentError("length of input array must equal number of windings"))
+    end
+    v1 = input[1]
+    flux_density = v1/(2*frequency*t.windings[1].turns*t.magnetics.effective_area)
+    core_specific_power = specificpowerloss(t,flux_density,frequency)
+    core_total_power = t.magnetics.effective_volume * core_specific_power
+    winding_voltage = [v1*t.windings[i].turns/t.windings[1].turns for i in eachindex(t.windings)]
+    winding_power = similar(input)
+    for i in 2:length(t.windings)
+      winding_power[i] = input[i]^2*resistance(t.windings[i])
+    end
+    p = sum(winding_power[2:end])+core_total_power+sum(input[2:end].*winding_voltage[2:end])
+    r1 = resistance(t.windings[1])
+    winding_power[1] = 0.0
+    i1 = 0.0
+    i1previous = 0.0
+    for i in 1:10
+      pbetter = p+winding_power[1]
+      i1 = pbetter/v1
+      if abs(i1-i1previous)<eps()*1000
+        break
+      end
+      i1previous = i1
+      winding_power[1] = i1^2*r1
+    end
+    total_power = core_total_power + sum(winding_power)
+    new(t, frequency, flux_density, core_specific_power,
+        core_total_power, winding_voltage, winding_power, total_power)
+  end
+end
+
+resistance(t::Transformer) = [resistance(t.windings[i]) for i in eachindex(t.windings)]
