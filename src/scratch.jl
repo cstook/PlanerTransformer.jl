@@ -71,14 +71,14 @@ e_core = core_geometry_dict["e14"]
 plate = core_geometry_dict["plt14"]
 material = ferrite_dict["3f4"]
 layer1 = WindingLayer(pcb,true,e_core,3)
-layer2 = WindingLayer(pcb,false,e_core,3)
-layer3 = WindingLayer(pcb,false,e_core,3)
+layer2 = WindingLayer(pcb,false,e_core,2)
+layer3 = WindingLayer(pcb,false,e_core,2)
 layer4 = WindingLayer(pcb,true,e_core,3)
 primary = Winding(pcb,[layer1,layer4],false)
 secondary = Winding(pcb,[layer2,layer3],true)
 magnetics = Magnetics(material, [e_core,plate])
 transformer = Transformer(magnetics,[primary,secondary])
-
+volts(transformer,150e3,500e3)
 
 
 # ER14.5/3/7-3F4-S

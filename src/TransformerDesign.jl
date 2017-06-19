@@ -1,5 +1,5 @@
 export Magnetics, Transformer
-export volt_seconds_per_turn, volts_per_turn
+export volt_seconds_per_turn, volts_per_turn, volts
 
 
 immutable Magnetics
@@ -28,6 +28,9 @@ immutable Transformer
   windings :: Array{Winding,1}
 end
 
+flux_density(m::Magnetics, coreloss::Float64, f::Float64) =
+  flux_density(m.ferriteproperties,coreloss,f)
+
 """julia
     volt_seconds_per_turn(effective_area, flux_density_pp)
     volt_seconds_per_turn(cg::CoreGeometry, flux_density_pp)
@@ -40,9 +43,9 @@ The first form is just an alias for multiply.  The second form pulls the
 volt_seconds_per_turn(effective_area::Float64, flux_density_pp::Float64) =
   effective_area * flux_density_pp
 volt_seconds_per_turn(cg::CoreGeometry, flux_density_pp::Float64) =
-  volt_seconds_per_turn(cg.effective_area, flux_density)
+  volt_seconds_per_turn(cg.effective_area, flux_density_pp)
 volt_seconds_per_turn(m::Magnetics, flux_density_pp::Float64) =
-  volt_seconds_per_turn(m.effective_area, flux_density)
+  volt_seconds_per_turn(m.effective_area, flux_density_pp)
 
 """julia
     volts_per_turn(cg::CoreGeometry,
@@ -71,9 +74,9 @@ volts_per_turn(t::Transformer, loss_limit::Float64, frequency::Float64) =
 
 
 function volts(w::Winding,m::Magnetics,loss_limit::Float64, frequency::Float64)
-  volts_per_turn(m,loss_limit,frequency))*w.turns
+  volts_per_turn(m,loss_limit,frequency)*w.turns
 end
 function volts(t::Transformer,loss_limit::Float64, frequency::Float64)
   vpt = volts_per_turn(t,loss_limit,frequency)
-  [vpt*t.windings[i] for in eachindex(t.windings)]
+  [vpt*t.windings[i].turns for i in eachindex(t.windings)]
 end

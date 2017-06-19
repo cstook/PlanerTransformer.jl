@@ -70,11 +70,12 @@ immutable Winding
     turns_1 = windinglayers[1].number_of_turns
     turns = turns_1
     for i in 2:length(windinglayers)
-      truns_i = windinglayers[i].number_of_turns
-      if ~isseries && turns_i != turns_1
+      turns_i = windinglayers[i].number_of_turns
+      if isseries
+        turns += turns_i
+      elseif turns_i != turns_1
         throw(ArgumentError("parallel windings must have same number of turns"))
       end
-      turns += turns_i
     end
     new(pcb,windinglayers,isseries,turns)
   end
