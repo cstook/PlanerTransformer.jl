@@ -81,11 +81,11 @@ transformer = Transformer(magnetics,[primary,secondary])
 frequency = 1e6
 volts(transformer,450e3,frequency)
 
-TransformerPowerDissipation(transformer,[4.0,5.0],frequency)
+t =TransformerPowerDissipation(transformer,[4.0,5.0],frequency)
 
 resistance(transformer)
 
-
+ChanInductor(transformer)
 
 
 
