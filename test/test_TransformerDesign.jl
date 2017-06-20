@@ -48,5 +48,17 @@ ci = ChanInductor(transformer)
 @test ci.lm ≈ 0.0334
 @test ci.lg ≈ 0.0
 @test ci.n ≈ 1.0
+resistance_array = resistance(transformer)
+@test resistance_array[1] ≈ 0.0015265864267914595
+@test resistance_array[2] ≈ 0.0027866178802512884
+power = TransformerPowerDissipation(transformer, [2.0,5.0], 1e6)
+@test power.flux_density ≈ 0.022988505747126436
+@test power.total_power ≈ 0.17442287749060426
+
+
+wrong_plate = core_geometry_dict["plt18"]
+@test_throws ArgumentError Magnetics(material, [e_core, wrong_plate])
+@test_throws ArgumentError Transformer(magnetics, [primary])
+@test_throws ArgumentError TransformerPowerDissipation(transformer, [2.4], 1e6)
 
 end # testset

@@ -24,4 +24,9 @@ temperature = 100.0
 @test resistance(secondary,temperature)≈0.006106345707165838
 @test turns(primary)==3
 @test turns(secondary)==6
+
+@test_throws ArgumentError Winding(pcb,[],false)
+layer5 = WindingLayer(pcb,true,core,2)
+@test_throws ArgumentError Winding(pcb,[layer3, layer5],false)
+
 end # testset

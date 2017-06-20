@@ -27,5 +27,5 @@ test_fp = FerriteProperties(0.2e6,0.5e6,25,100,
 @test_throws ArgumentError SpecificPowerLossData((1),(2,3))
 @test_throws ArgumentError SpecificPowerLossData((1,2,3),((1,10),(2,20)))
 
-@test_throws ArgumentError SpecificPowerLossData(1,2,3,4)
+@test_throws ArgumentError SpecificPowerLossData(SplInput((1,2,3,4)))
 end # testset
