@@ -48,12 +48,19 @@ ci = ChanInductor(transformer)
 @test ci.lm ≈ 0.0334
 @test ci.lg ≈ 0.0
 @test ci.n ≈ 1.0
+testshow(ci,"Hc=50.0, Bs=0.345, Br=0.14, A=1.45e-5, Lm=0.0334, Lg=0.0, N=1.0\n")
+
 resistance_array = resistance(transformer)
 @test resistance_array[1] ≈ 0.0015265864267914595
 @test resistance_array[2] ≈ 0.0027866178802512884
 power = TransformerPowerDissipation(transformer, [2.0,5.0], 1e6)
 @test power.flux_density ≈ 0.022988505747126436
 @test power.total_power ≈ 0.17442287749060426
+@test flux_density(magnetics,150e3,1e6) ≈ 0.031109516217764782
+@test volt_seconds_per_turn(magnetics, 0.03) ≈ 4.3499999999999996e-7
+@test volts_per_turn(magnetics, 150e3, 1e6) ≈ 0.9021759703151787
+@test volts(primary,magnetics,150e3,1e6) ≈ 2.7065279109455362
+
 
 
 wrong_plate = core_geometry_dict["plt18"]
