@@ -12,7 +12,7 @@ export CoreGeometry
 - `effective_area`      -- m^2
 - `mass`                -- Kg
 """
-immutable CoreGeometry
+struct CoreGeometry
   # all values are in MKS units
   winding_aperture :: Float64
   half_center_width :: Float64  # center_radius for ER

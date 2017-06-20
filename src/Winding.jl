@@ -1,7 +1,7 @@
 export PCB_Specification, WindingLayer, turns
 export Winding, copper_weight_to_meters, resistance
 
-immutable PCB_Specification
+struct PCB_Specification
   trace_edge_gap :: Float64
   trace_trace_gap :: Float64
   outer_copper_thickness :: Float64
@@ -34,7 +34,7 @@ by 0.48e-3 to give thickness in meters.
 """
 copper_weight_to_meters(oz) = 0.48e-3*oz
 
-immutable WindingLayer
+struct WindingLayer
   width :: Float64
   length :: Float64
   thickness :: Float64
@@ -58,7 +58,7 @@ function WindingLayer(pcb :: PCB_Specification,
   WindingLayer(trace_width, trace_length, trace_thickness, number_of_turns)
 end
 
-immutable Winding
+struct Winding
   pcb :: PCB_Specification
   windinglayers :: Array{WindingLayer,1}
   isseries :: Bool

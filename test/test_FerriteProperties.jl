@@ -22,4 +22,10 @@ test_fp = FerriteProperties(0.2e6,0.5e6,25,100,
 # need better inverse function at some point
 @test flux_density(test_fp.spl_hot,42277.685735775805,600e3)≈0.019989634564937644
 @test flux_density(test_fp,42277.685735775805,600e3)≈0.019989634564937644
+
+@test_throws ArgumentError SpecificPowerLossData((),())
+@test_throws ArgumentError SpecificPowerLossData((1),(2,3))
+@test_throws ArgumentError SpecificPowerLossData((1,2,3),((1,10),(2,20)))
+
+@test_throws ArgumentError SpecificPowerLossData(1,2,3,4)
 end # testset

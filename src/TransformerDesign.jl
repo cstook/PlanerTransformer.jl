@@ -2,7 +2,7 @@ export Magnetics, Transformer
 export volt_seconds_per_turn, volts_per_turn, volts
 
 
-immutable Magnetics
+struct Magnetics
   ferriteproperties :: FerriteProperties
   cores :: Array{CoreGeometry,1}
   effective_volume :: Float64
@@ -23,7 +23,7 @@ immutable Magnetics
   end
 end
 
-immutable Transformer
+struct Transformer
   magnetics :: Magnetics
   windings :: Array{Winding,1}
 end

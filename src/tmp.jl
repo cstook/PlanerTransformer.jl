@@ -18,7 +18,7 @@ Geometry of the windings.
 The second form takes parameters from `core` and PCB parameters.  Geometry
 is used to calculate winding resistance, and to layout PCB.
 """
-immutable Winding
+struct Winding
   width :: Float64
   length :: Float64
   thickness :: Float64

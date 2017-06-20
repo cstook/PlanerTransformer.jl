@@ -14,7 +14,7 @@ Define the BH loop of a magnetic material.
 - `bs`      -- Remnant flux density (Tesla)
 - `br`      -- Saturation flux density (Tesla)
 """
-immutable BHloop
+struct BHloop
   hc :: Float64
   bs :: Float64
   br :: Float64
@@ -37,7 +37,7 @@ In order to simplify manual data entry, data my also be passed as a SplInput
 """
 SpecificPowerLossData
 
-immutable SpecificPowerLossData
+struct SpecificPowerLossData
   frequency :: Tuple  # in Hz
   mb :: Tuple  # y = mx + b
   # y in W/m^3
@@ -72,7 +72,7 @@ Data format is as follows.
 The only purpose of this object is to pass to `SpecificPowerLossData`.  Data is
 converted to MKS units there.
 """
-immutable SplInput
+struct SplInput
   data :: Tuple
 end
 
@@ -145,7 +145,7 @@ Store material data.
 - `bh_hot`            -- BH loop at hot temperature
 - `spl_hot`           -- specfic power loss data at hot temperature
 """
-immutable FerriteProperties
+struct FerriteProperties
   fmin :: Float64
   fmax :: Float64
   troom :: Float64
