@@ -78,7 +78,32 @@ primary = Winding(pcb,[layer1,layer4],false)
 secondary = Winding(pcb,[layer2,layer3],true)
 magnetics = Magnetics(material, [e_core,plate])
 transformer = Transformer(magnetics,[primary,secondary])
-volts(transformer,150e3,500e3)
+frequency = 1e6
+volts(transformer,450e3,frequency)
+
+t =TransformerPowerDissipation(transformer,[4.0,5.0],frequency)
+
+resistance(transformer)
+
+ChanInductor(transformer)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # ER14.5/3/7-3F4-S

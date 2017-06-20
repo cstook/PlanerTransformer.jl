@@ -10,7 +10,7 @@ test_fp = FerriteProperties(0.2e6,0.5e6,25,100,
                             BHloop(15,.44,.15),
                             BHloop(10,.345,.120),
                             SpecificPowerLossData(test_spldata)) # 3f3
-test_cg = CoreGeometry(4e-3,     1.5e-3,   5e-3, 300e-9, 14.5e-6, 0.6e-3) # e14
+test_cg = CoreGeometry(4e-3,     1.5e-3,   5e-3, 300e-9, 14.5e-6, 16.7e-3, 0.6e-3) # e14
 @test volt_seconds_per_turn(2.0,3.0)≈6.0
 @test volt_seconds_per_turn(test_cg,2.0) ≈ 14.5e-6*2.0
 @test volts_per_turn(test_fp, test_cg, 150e3, 500e3) ≈ 0.6005999150244018
@@ -40,6 +40,13 @@ transformer = Transformer(magnetics,[primary,secondary])
 v = volts(transformer,150e3,500e3)
 @test v[1]≈2.2455612451812534
 @test v[2]≈2.9940816602416715
-
+ci = ChanInductor(transformer)
+@test ci.hc ≈ 50.0
+@test ci.bs ≈ 0.345
+@test ci.br ≈ 0.14
+@test ci.a ≈ 1.45e-5
+@test ci.lm ≈ 0.0334
+@test ci.lg ≈ 0.0
+@test ci.n ≈ 1.0
 
 end # testset

@@ -10,6 +10,7 @@ export CoreGeometry
 - `center_length`       -- m
 - `effective_volume`    -- m^3
 - `effective_area`      -- m^2
+- `effective_length`    -- m
 - `mass`                -- Kg
 """
 struct CoreGeometry
@@ -19,5 +20,6 @@ struct CoreGeometry
   center_length :: Float64
   effective_volume :: Float64
   effective_area :: Float64
+  effective_length :: Float64
   mass :: Float64
 end
