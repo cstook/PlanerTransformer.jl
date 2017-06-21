@@ -1,6 +1,6 @@
 export Magnetics, Transformer
 export volt_seconds_per_turn, volts_per_turn, volts
-export TransformerPowerDissipation, ChanInductor
+export TransformerPowerDissipation, ChanInductor, equivalent_parallel_resistance
 
 struct Magnetics
   ferriteproperties :: FerriteProperties
@@ -115,10 +115,10 @@ immutable TransformerPowerDissipation
     winding_voltage = [v1*t.windings[i].turns/t.windings[1].turns for i in eachindex(t.windings)]
     winding_power = similar(input)
     for i in 2:length(t.windings)
-      winding_power[i] = input[i]^2*resistance(t.windings[i])
+      winding_power[i] = input[i]^2*winding_resistance(t.windings[i])
     end
     p = sum(winding_power[2:end])+core_total_power+sum(input[2:end].*winding_voltage[2:end])
-    r1 = resistance(t.windings[1])
+    r1 = winding_resistance(t.windings[1])
     winding_power[1] = 0.0
     i1 = 0.0
     i1previous = 0.0
@@ -137,7 +137,7 @@ immutable TransformerPowerDissipation
   end
 end
 
-resistance(t::Transformer) = [resistance(t.windings[i]) for i in eachindex(t.windings)]
+winding_resistance(t::Transformer) = [winding_resistance(t.windings[i]) for i in eachindex(t.windings)]
 
 immutable ChanInductor
   hc :: Float64
@@ -160,4 +160,46 @@ ChanInductor(t::Transformer, ishot=true) =
 function Base.show(io::IO,ci::ChanInductor)
   println(io,"Hc=",ci.hc,", Bs=",ci.bs,", Br=",ci.br,", A=",
           ci.a,", Lm=",ci.lm,", Lg=",ci.lg,", N=",ci.n)
+end
+
+
+center_frequency(fp::FerriteProperties) = middle(fp.fmin,fp.fmax)
+center_frequency(m::Magnetics) = center_frequency(m.ferriteproperties)
+center_frequency(t::Transformer) = center_frequency(t.magnetics)
+function equivalent_parallel_resistance(fp::FerriteProperties,
+                                        effective_area::Float64,
+                                        effective_volume::Float64,
+                                        volts::Float64,
+                                        frequency::Float64=center_frequency(fp),
+                                        turns::Float64=1.0,
+                                        ishot::Bool=true)
+  flux_density = volts/(2.0*frequency*turns*effective_area)
+  spldata = ishot?fp.spl_hot:fp.spl_room
+  spl = specificpowerloss(spldata,flux_density,frequency)
+  loss = spl*effective_volume
+  volts^2/loss
+end
+function equivalent_parallel_resistance(m::Magnetics,
+                                        volts::Float64,
+                                        frequency::Float64=center_frequency(m),
+                                        turns::Float64=1.0,
+                                        ishot::Bool=true)
+  equivalent_parallel_resistance(m.ferriteproperties,
+                                 m.effective_area,
+                                 m.effective_volume,
+                                 volts,
+                                 frequency,
+                                 turns,
+                                 ishot)
+end
+function equivalent_parallel_resistance(t::Transformer,
+                                        volts::Float64,
+                                        frequency::Float64=center_frequency(t),
+                                        turns::Float64=1.0,
+                                        ishot::Bool=true)
+  equivalent_parallel_resistance(t.magnetics,
+                                 volts,
+                                 frequency,
+                                 turns,
+                                 ishot)
 end

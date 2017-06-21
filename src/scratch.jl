@@ -19,7 +19,7 @@ flux_density_peak = flux_density(ferrite_dict[material],loss_limit,frequency)
 flux_density_pp = 2*flux_density_peak
 vst = volt_seconds_per_turn(core_geometry_dict[core],flux_density_pp)
 vt = volts_per_turn(core_geometry_dict[core],ferrite_dict[material],loss_limit,frequency)
-r = resistance(Winding(core_geometry_dict[core],
+r = winding_resistance(Winding(core_geometry_dict[core],
                        number_of_turns,
                        trace_edge_gap,
                        trace_trace_gap,
@@ -80,16 +80,41 @@ magnetics = Magnetics(material, [e_core,plate])
 transformer = Transformer(magnetics,[primary,secondary])
 frequency = 1e6
 volts(transformer,450e3,frequency)
-
-t =TransformerPowerDissipation(transformer,[4.0,5.0],frequency)
-
-resistance(transformer)
-
-ChanInductor(transformer)
-
+tpd =TransformerPowerDissipation(transformer,[2.0,5.0],frequency)
+winding_resistance(transformer)
+ci = ChanInductor(transformer)
+PlanerTransformer.center_frequency(transformer)
+equivalent_parallel_resistance(transformer,.333,1e6)
 
 
+using PlanerTransformer
+trace_edge_gap = 0.16e-3
+trace_trace_gap = 0.13e-3
+outer_copper_thickness = copper_weight_to_meters(1.0)
+inner_copper_thickness = copper_weight_to_meters(1.0)
+number_of_layers = 2
+pcb = PCB_Specification(trace_edge_gap,
+                        trace_trace_gap,
+                        outer_copper_thickness,
+                        inner_copper_thickness,
+                        number_of_layers)
 
+e_core = core_geometry_dict["e14"]
+plate = core_geometry_dict["plt14"]
+material = ferrite_dict["3f4"]
+layer1 = WindingLayer(pcb,true,e_core,1)
+layer2 = WindingLayer(pcb,true,e_core,1)
+primary = Winding(pcb,[layer1],false)
+secondary = Winding(pcb,[layer2],false)
+magnetics = Magnetics(material, [e_core,plate])
+transformer = Transformer(magnetics,[primary,secondary])
+frequency = 1e6
+volts(transformer,450e3,frequency)
+tpd =TransformerPowerDissipation(transformer,[0.5,1.0],frequency)
+winding_resistance(transformer)
+ci = ChanInductor(transformer)
+PlanerTransformer.center_frequency(transformer)
+equivalent_parallel_resistance(transformer,0.5,1e6)
 
 
 

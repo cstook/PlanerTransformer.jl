@@ -1,5 +1,5 @@
 export PCB_Specification, WindingLayer, turns
-export Winding, copper_weight_to_meters, resistance
+export Winding, copper_weight_to_meters, winding_resistance
 
 struct PCB_Specification
   trace_edge_gap :: Float64
@@ -85,15 +85,15 @@ function conductivity(ρ_20::Float64, temperature_coefficient::Float64, temperat
   ρ_20*(1 + temperature_coefficient*(temperature-20.0))
 end
 # todo: add skin effect
-resistance(wl::WindingLayer, ρ::Float64) = ρ*wl.length/(wl.width*wl.thickness)
-function resistance(wl::WindingLayer, pcb::PCB_Specification, temperature::Float64)
+winding_resistance(wl::WindingLayer, ρ::Float64) = ρ*wl.length/(wl.width*wl.thickness)
+function winding_resistance(wl::WindingLayer, pcb::PCB_Specification, temperature::Float64)
   ρ = conductivity(pcb.ρ_20, pcb.temperature_coefficient, temperature)
-  resistance(wl,ρ)
+  winding_resistance(wl,ρ)
 end
-function resistance(w::Winding, temperature=100.0)
+function winding_resistance(w::Winding, temperature=100.0)
   x = 0.0
   for i in eachindex(w.windinglayers)
-    r = resistance(w.windinglayers[i],w.pcb,temperature)
+    r = winding_resistance(w.windinglayers[i],w.pcb,temperature)
     x += w.isseries ?  r : 1/r
   end
   return w.isseries ?  x : 1/x

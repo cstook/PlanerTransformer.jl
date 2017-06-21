@@ -122,7 +122,7 @@ function specificpowerloss(spl::SpecificPowerLossData, flux_density::Float64, f:
   # spl = tabulated specific power loss data from graph on datasheet
   # flux_density = magnetic field strength in Tesla
   # f = frequency in Hz
-  # retruns specfic power loss at flux_density in Tesla, f in W/m^3
+  # retruns specfic power loss (W/m^3) at flux_density (Tesla), f (Hz)
   indexrange = find_nearest_spl_frequency_indices(spl,f)
   f_array = [spl.frequency[i] for i in indexrange]
   pv_array = [spl.mb[i][1]*log10(flux_density)+spl.mb[i][2] for i in indexrange]

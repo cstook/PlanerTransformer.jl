@@ -20,8 +20,8 @@ primary = Winding(pcb,[layer1,layer4],false)
 secondary = Winding(pcb,[layer2,layer3],true)
 
 temperature = 100.0
-@test resistance(primary,temperature)≈0.0015265864267914595
-@test resistance(secondary,temperature)≈0.006106345707165838
+@test winding_resistance(primary,temperature)≈0.0015265864267914595
+@test winding_resistance(secondary,temperature)≈0.006106345707165838
 @test turns(primary)==3
 @test turns(secondary)==6
 
