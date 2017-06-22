@@ -1,6 +1,27 @@
 export PCB_Specification, WindingLayer, turns
 export Winding, copper_weight_to_meters, winding_resistance
 
+
+"""julia
+    PCB_Specification(trace_edge_gap,
+                      trace_trace_gap,
+                      outer_copper_thickness,
+                      inner_copper_thickness = 0.0,
+                      number_of_layers = 2,
+                      ρ_20=1.68e-8,
+                      temperature_coefficient=0.003862)
+
+Store PCB data.
+
+** Fields **
+- `trace_edge_gap`          -- minimum distance from trace to PCB edge (m)
+- `trace_trace_gap`         -- minimum distance between traces (m)
+- `outer_copper_thickness`  -- thickness of top and bottom copper layers (m)
+- `inner_copper_thickness`  -- thickness of inner copper layers (m)
+- `number_of_layers`        -- number of copper layers
+- `ρ_20`                    -- conductivity, default to 1.68e-8 Ωm for Cu @ 20C
+- `temperature_coefficient` -- default to 0.003862 1/K for Cu
+"""
 struct PCB_Specification
   trace_edge_gap :: Float64
   trace_trace_gap :: Float64
@@ -34,12 +55,29 @@ by 0.48e-3 to give thickness in meters.
 """
 copper_weight_to_meters(oz) = 0.48e-3*oz
 
+"""julia
+    WindingLayer
+
+**Fields**
+- `width`           -- width of trace (m)
+- `length`          -- length of trace (m)
+- `thickness'       -- thickness of trace (m)
+- `number_of_turns' -- number of turns
+"""
 struct WindingLayer
   width :: Float64
   length :: Float64
   thickness :: Float64
   number_of_turns :: Int
 end
+"""julia
+    WindingLayer(pcb :: PCB_Specification,
+                 isouter :: Bool,
+                 core :: CoreGeometry,
+                 number_of_turns :: Int)
+
+Create a `WindingLayer` for a specific core and PCB.
+"""
 function WindingLayer(pcb :: PCB_Specification,
                       isouter :: Bool,
                       core :: CoreGeometry,
@@ -58,6 +96,13 @@ function WindingLayer(pcb :: PCB_Specification,
   WindingLayer(trace_width, trace_length, trace_thickness, number_of_turns)
 end
 
+"""julia
+    Winding(pcb::PCB_Specification,
+            windinglayers,
+            isseries::Bool)
+
+Create a `Winding` by combining several `WindingLayers`.
+"""
 struct Winding
   pcb :: PCB_Specification
   windinglayers :: Array{WindingLayer,1}
@@ -81,12 +126,20 @@ struct Winding
   end
 end
 
-function conductivity(ρ_20::Float64, temperature_coefficient::Float64, temperature::Float64)
+function conductivity(ρ_20, temperature_coefficient, temperature)
   ρ_20*(1 + temperature_coefficient*(temperature-20.0))
 end
 # todo: add skin effect
-winding_resistance(wl::WindingLayer, ρ::Float64) = ρ*wl.length/(wl.width*wl.thickness)
-function winding_resistance(wl::WindingLayer, pcb::PCB_Specification, temperature::Float64)
+
+"""julia
+    winding_resistance(wl::WindingLayer, ρ)
+    winding_resistance(wl::WindingLayer, pcb::PCB_Specification, temperature=100.0)
+    winding_resistance(w::Winding, temperature=100.0)
+
+Returns the resistance of a `Winding` or `WindingLayer`.
+"""
+winding_resistance(wl::WindingLayer, ρ) = ρ*wl.length/(wl.width*wl.thickness)
+function winding_resistance(wl::WindingLayer, pcb::PCB_Specification, temperature=100.0)
   ρ = conductivity(pcb.ρ_20, pcb.temperature_coefficient, temperature)
   winding_resistance(wl,ρ)
 end
@@ -98,6 +151,15 @@ function winding_resistance(w::Winding, temperature=100.0)
   end
   return w.isseries ?  x : 1/x
 end
+
+"""julia
+    turns(wl::WindingLayer)
+    turns(w::Winding)
+    turns(t::Transformer)
+
+Number of turns, Array for `Transformer`.
+"""
+turns
 
 turns(wl::WindingLayer) = wl.number_of_turns
 function turns(w::Winding)

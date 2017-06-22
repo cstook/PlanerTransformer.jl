@@ -86,6 +86,8 @@ ci = ChanInductor(transformer)
 PlanerTransformer.center_frequency(transformer)
 equivalent_parallel_resistance(transformer,.333,1e6)
 
+turns.(transformer.windings)
+
 
 using PlanerTransformer
 trace_edge_gap = 0.16e-3
@@ -121,11 +123,15 @@ equivalent_parallel_resistance(transformer,0.5,1e6)
 
 
 
+ferrite_dict["3f3"]
 
 
 
-
-
+struct T
+  x :: Array{Int,1}
+end
+T([1,2,3,4])
+T((1,2,3,4))
 
 
 

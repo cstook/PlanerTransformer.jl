@@ -1,3 +1,11 @@
 *.jl.cov
 *.jl.*.cov
 *.jl.mem
+*.log
+*.raw
+*.lnk
+site/
+docs/build/
+docs/site/
+docs/src/.ipynb_checkpoints/
+src/.ipynb_checkpoints/

@@ -30,7 +30,7 @@ each frequency.
 
 **Fields**
 - `frequency`   -- frequency of linear approximation (Hz)
-- `mb`          -- Tuple (slope, offset) defining the approximation
+- `mb`          -- Tuple (slope, offset) defining the linear approximation
 
 In order to simplify manual data entry, data my also be passed as a SplInput
   object.  All data is in MKS units (Hz, Tesla, W/m^3).
@@ -65,7 +65,7 @@ Data format is as follows.
 (f1,(x1,y1),(x2,y2), f2,(x3,y3),(x4,y4), ...)
 
 **Elements of Tuple**
-- `f1`    -- frequency (Hz)
+- `fn`    -- frequency (Hz)
 - `xn`    -- flux density (mT)
 - `yn`    -- specific power loss (Kw/m^3)
 
@@ -104,7 +104,7 @@ function interpolate_third_point(x1,y1,x2,y2, x3)
   b = y1-x1*m
   return m*x3+b
 end
-function find_nearest_spl_frequency_indices(spl::SpecificPowerLossData,f::Float64)
+function find_nearest_spl_frequency_indices(spl::SpecificPowerLossData,f)
   i = 2
   for i in 2:length(spl.frequency) # there will never be many of these
     if spl.frequency[i]>f break end
@@ -115,10 +115,14 @@ end
 """julia
     specificpowerloss(spl::SpecificPowerLossData, flux_density, frequency)
     specificpowerloss(fp::FerriteProperties, flux_density, frequency)
+    specificpowerloss(m::Magnetics, flux_density, frequency)
+    specificpowerloss(t::Transformer, flux_density, frequency)
 
 Returns specific power loss.
 """
-function specificpowerloss(spl::SpecificPowerLossData, flux_density::Float64, f::Float64)
+specificpowerloss
+
+function specificpowerloss(spl::SpecificPowerLossData, flux_density, f)
   # spl = tabulated specific power loss data from graph on datasheet
   # flux_density = magnetic field strength in Tesla
   # f = frequency in Hz
@@ -155,15 +159,19 @@ struct FerriteProperties
   spl_hot :: SpecificPowerLossData
 end
 
-specificpowerloss(fp::FerriteProperties, flux_density::Float64, f::Float64) =
+specificpowerloss(fp::FerriteProperties, flux_density, f) =
   specificpowerloss(fp.spl_hot,flux_density,f)
 
 """julia
     flux_density(spl::SpecificPowerLossData, coreloss, frequency)
     flux_density(fp::FerriteProperties, coreloss, frequency)
+    flux_density(m::Magnetics, coreloss, frequency)
+    flux_density(t::Transformer, coreloss, frequency)
 
 Returns magnetic field strength in Tesla.
 """
+flux_density
+
 function flux_density(spl::SpecificPowerLossData, coreloss::Float64, f::Float64)
   # spl = tabulated specific power loss data from graph on datasheet
   # coreloss = specfic power loss at b,f in W/m^3
