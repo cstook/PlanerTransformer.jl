@@ -122,7 +122,7 @@ end
 
 
 """
-    TransformerPowerDissipation(t::Transformer, input::Array{Real,1}, frequency)
+    TransformerPowerDissipation(t::Transformer, input::Array{Float64,1}, frequency)
 
 Computes power dissipation of transformer.
 
@@ -149,7 +149,7 @@ immutable TransformerPowerDissipation
   core_total_power :: Float64
   winding_power :: Array{Float64,1}
   total_power :: Float64
-  function TransformerPowerDissipation(t::Transformer, input::Array{Real,1}, frequency)
+  function TransformerPowerDissipation(t::Transformer, input::Array{Float64,1}, frequency)
     # input = [Vin, Iout, Iout, ...]
     # first winding is always input
     if length(t.windings) != length(input)
