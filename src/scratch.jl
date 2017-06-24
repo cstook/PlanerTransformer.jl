@@ -135,8 +135,9 @@ T((1,2,3,4))
 
 
 
-
-
+cd("C:\\Users\\Chris")
+cd("C:/Users/Chris/.julia/v0.6/PlanerTransformer/docs")
+include("make.jl")
 # ER14.5/3/7-3F4-S
 # E14/3.5/5/R-3F4
 # PLT14/5/1.5/S-3F4

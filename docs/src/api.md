@@ -1,0 +1,23 @@
+# Interface
+
+```@docs
+PCB_Specification
+copper_weight_to_meters
+CoreGeometry
+FerriteProperties
+BHloop
+SpecificPowerLossData
+WindingLayer
+Winding
+Magnetics
+Transformer
+turns
+winding_resistance
+TransformerPowerDissipation
+volt_seconds_per_turn
+volt_seconds
+volts_per_turn
+specificpowerloss
+flux_density
+SplInput
+```

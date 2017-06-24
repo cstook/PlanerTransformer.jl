@@ -1,9 +1,9 @@
 export Magnetics, Transformer
-export volt_seconds_per_turn, volts_per_turn, volts
+export volt_seconds_per_turn, volts_per_turn, volts, volt_seconds
 export TransformerPowerDissipation, ChanInductor, equivalent_parallel_resistance
 
 
-"""julia
+"""
     Magnetics(fp::FerriteProperties, cores::Array{CoreGeometry,1})
 
 All magnetic information for `Transformer` in one object.
@@ -32,7 +32,7 @@ struct Magnetics
   end
 end
 
-"""julia
+"""
     Transformer(m::Magnetics,w::Array{Winding,1})
 
 `Transformer` is a combination of `Magnetics` and two or more windings.
@@ -59,7 +59,7 @@ specificpowerloss(t::Transformer, flux_density::Float64, f::Float64)=
 
 turns(t::Transformer) = turns.(t.windings)
 
-"""julia
+"""
     volt_seconds_per_turn(effective_area, flux_density_pp)
     volt_seconds_per_turn(cg::CoreGeometry, flux_density_pp)
     volt_seconds_per_turn(m::Magnetics, flux_density_pp)
@@ -77,7 +77,7 @@ volt_seconds_per_turn(t::Transformer, flux_density_pp) =
   volt_seconds_per_turn(t.magnetics, flux_density_pp)
 
 
-"""julia
+"""
     volt_seconds(t::Transformer, flux_density_pp)
 
 Volt seconds at `flux_density_pp`.
@@ -87,7 +87,7 @@ volt_seconds(t::Transformer, flux_density_pp) =
 
 
 # need to rethink this
-"""julia
+"""
     volts_per_turn(cg::CoreGeometry,
                    fp::FerriteProperties, loss_limit, frequency)
 
@@ -120,6 +120,26 @@ function volts(t::Transformer,loss_limit::Float64, frequency::Float64)
   [vpt*t.windings[i].turns for i in eachindex(t.windings)]
 end
 
+
+"""
+    TransformerPowerDissipation(t::Transformer, input::Array{Real,1}, frequency)
+
+Computes power dissipation of transformer.
+
+The first element of the input array is the peak to peak voltage applied to the
+first winding.  The following elements are the load currents in the output
+windings.  Returns a `TransformerPowerDissipation` object.
+
+**Fields**
+- `transformer`             -- from input
+- `frequency`               -- from input
+- `flux_density`            -- peak flux density (Tesla)
+- `winding_voltage`         -- peak to peak voltage on each winding
+- `core_specific_power`     -- power dissipated in core (W/m^3)
+- `core_total_power`        -- power dissipated in core (W)
+- `winding_power`           -- power dissipated in each winding (W)
+- `total_power`             -- `core_total_power +sum(winding_power)`
+"""
 immutable TransformerPowerDissipation
   transformer :: Transformer
   frequency :: Float64
@@ -129,7 +149,7 @@ immutable TransformerPowerDissipation
   core_total_power :: Float64
   winding_power :: Array{Float64,1}
   total_power :: Float64
-  function TransformerPowerDissipation(t::Transformer, input::Array{Float64,1}, frequency::Float64)
+  function TransformerPowerDissipation(t::Transformer, input::Array{Real,1}, frequency)
     # input = [Vin, Iout, Iout, ...]
     # first winding is always input
     if length(t.windings) != length(input)

@@ -1,7 +1,7 @@
 export CoreGeometry
 
 
-"""julia
+"""
     CoreGeometry
 
 **Fields**

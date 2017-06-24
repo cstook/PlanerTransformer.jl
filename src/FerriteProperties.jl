@@ -4,7 +4,7 @@ export flux_density, specificpowerloss
 
 
 
-"""julia
+"""
     BHloop(hc,bs,br)
 
 Define the BH loop of a magnetic material.
@@ -19,7 +19,7 @@ struct BHloop
   bs :: Float64
   br :: Float64
 end
-"""julia
+"""
     SpecificPowerLossData(frequency::Tuple, mb::Tuple)
     SpecificPowerLossData(input::SplInput)
 
@@ -56,7 +56,7 @@ struct SpecificPowerLossData
   end
 end
 
-"""julia
+"""
     SplInput(data::Tuple)
 
 Simplify manual input of specific power loss data.
@@ -65,9 +65,9 @@ Data format is as follows.
 (f1,(x1,y1),(x2,y2), f2,(x3,y3),(x4,y4), ...)
 
 **Elements of Tuple**
-- `fn`    -- frequency (Hz)
-- `xn`    -- flux density (mT)
-- `yn`    -- specific power loss (Kw/m^3)
+- fn    -- frequency (Hz)
+- xn    -- flux density (mT)
+- yn    -- specific power loss (Kw/m^3)
 
 The only purpose of this object is to pass to `SpecificPowerLossData`.  Data is
 converted to MKS units there.
@@ -112,7 +112,7 @@ function find_nearest_spl_frequency_indices(spl::SpecificPowerLossData,f)
   return i-1:i
 end
 
-"""julia
+"""
     specificpowerloss(spl::SpecificPowerLossData, flux_density, frequency)
     specificpowerloss(fp::FerriteProperties, flux_density, frequency)
     specificpowerloss(m::Magnetics, flux_density, frequency)
@@ -135,7 +135,7 @@ function specificpowerloss(spl::SpecificPowerLossData, flux_density, f)
   return pv # specicic power loss (W/m^3) at flux_density, frequency f
 end
 
-"""julia
+"""
     FerriteProperties(frequency_range, troom, thot, bh_room, bh_hot, spl_hot)
 
 Store material data.
@@ -162,7 +162,7 @@ end
 specificpowerloss(fp::FerriteProperties, flux_density, f) =
   specificpowerloss(fp.spl_hot,flux_density,f)
 
-"""julia
+"""
     flux_density(spl::SpecificPowerLossData, coreloss, frequency)
     flux_density(fp::FerriteProperties, coreloss, frequency)
     flux_density(m::Magnetics, coreloss, frequency)

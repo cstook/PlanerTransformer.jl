@@ -2,7 +2,7 @@ export PCB_Specification, WindingLayer, turns
 export Winding, copper_weight_to_meters, winding_resistance
 
 
-"""julia
+"""
     PCB_Specification(trace_edge_gap,
                       trace_trace_gap,
                       outer_copper_thickness,
@@ -47,7 +47,7 @@ struct PCB_Specification
   end
 end
 
-"""julia
+"""
     copper_weight_to_meters(oz)
 
 PCB copper thickness is typicaly given in ounces.  This function multiplies
@@ -55,14 +55,14 @@ by 0.48e-3 to give thickness in meters.
 """
 copper_weight_to_meters(oz) = 0.48e-3*oz
 
-"""julia
+"""
     WindingLayer
 
 **Fields**
 - `width`           -- width of trace (m)
 - `length`          -- length of trace (m)
-- `thickness'       -- thickness of trace (m)
-- `number_of_turns' -- number of turns
+- `thickness`       -- thickness of trace (m)
+- `number_of_turns` -- number of turns
 """
 struct WindingLayer
   width :: Float64
@@ -70,7 +70,7 @@ struct WindingLayer
   thickness :: Float64
   number_of_turns :: Int
 end
-"""julia
+"""
     WindingLayer(pcb :: PCB_Specification,
                  isouter :: Bool,
                  core :: CoreGeometry,
@@ -96,7 +96,7 @@ function WindingLayer(pcb :: PCB_Specification,
   WindingLayer(trace_width, trace_length, trace_thickness, number_of_turns)
 end
 
-"""julia
+"""
     Winding(pcb::PCB_Specification,
             windinglayers,
             isseries::Bool)
@@ -131,7 +131,7 @@ function conductivity(ρ_20, temperature_coefficient, temperature)
 end
 # todo: add skin effect
 
-"""julia
+"""
     winding_resistance(wl::WindingLayer, ρ)
     winding_resistance(wl::WindingLayer, pcb::PCB_Specification, temperature=100.0)
     winding_resistance(w::Winding, temperature=100.0)
@@ -152,7 +152,7 @@ function winding_resistance(w::Winding, temperature=100.0)
   return w.isseries ?  x : 1/x
 end
 
-"""julia
+"""
     turns(wl::WindingLayer)
     turns(w::Winding)
     turns(t::Transformer)
