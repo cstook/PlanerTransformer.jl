@@ -19,7 +19,11 @@ makedocs(
 if true #"deploy" in ARGS
   deploydocs(
     repo = "github.com/cstook/PlanerTransformer.jl.git",
-    target = "build",
+    target = "site",
+    branch = "gh-pages",
+    latest = "master",
+    osname = "linux",
+    julia  = "0.6",
     deps = nothing,
     make = nothing,
   )
