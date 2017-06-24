@@ -140,7 +140,7 @@ windings.  Returns a `TransformerPowerDissipation` object.
 - `winding_power`           -- power dissipated in each winding (W)
 - `total_power`             -- `core_total_power +sum(winding_power)`
 """
-immutable TransformerPowerDissipation
+struct TransformerPowerDissipation
   transformer :: Transformer
   frequency :: Float64
   flux_density ::Float64
@@ -186,7 +186,7 @@ end
 
 winding_resistance(t::Transformer) = [winding_resistance(t.windings[i]) for i in eachindex(t.windings)]
 
-immutable ChanInductor
+struct ChanInductor
   hc :: Float64
   bs :: Float64
   br :: Float64
