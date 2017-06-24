@@ -13,10 +13,10 @@ makedocs(
   sitename = "PlanerTransformer",
   authors = "Chris Stook",
   pages = PAGES,
-  html_prettyurls = ("deploy" in ARGS),
+  html_prettyurls = true #("deploy" in ARGS),
 )
 
-if "deploy" in ARGS
+if true #"deploy" in ARGS
   deploydocs(
     repo = "github.com/cstook/PlanerTransformer.jl.git",
     target = "build",
