@@ -10,13 +10,14 @@ makedocs(
   doctest   = "doctest" in ARGS,
   linkcheck = "linkcheck" in ARGS,
   format    = "pdf" in ARGS ? :latex : :html,
+  build = "site",
   sitename = "PlanerTransformer",
   authors = "Chris Stook",
   pages = PAGES,
-  html_prettyurls = true #("deploy" in ARGS),
+  html_prettyurls = "deploy" in ARGS,
 )
 
-if true #"deploy" in ARGS
+if "deploy" in ARGS
   deploydocs(
     repo = "github.com/cstook/PlanerTransformer.jl.git",
     target = "site",
