@@ -8,6 +8,7 @@ FerriteProperties
 BHloop
 SpecificPowerLossData
 WindingLayer
+winding_layer
 Winding
 Magnetics
 Transformer
@@ -17,8 +18,9 @@ TransformerPowerDissipation
 volt_seconds_per_turn
 volt_seconds
 equivalent_parallel_resistance
+chan_inductor
 volts_per_turn
-specificpowerloss
+specific_power_loss
 flux_density
 SplInput
 ```

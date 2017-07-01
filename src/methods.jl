@@ -1,7 +1,7 @@
-export flux_density, specificpowerloss
+export flux_density, specific_power_loss
 export turns, copper_weight_to_meters, winding_resistance
 export volt_seconds_per_turn, volts_per_turn, volts, volt_seconds
-export equivalent_parallel_resistance
+export equivalent_parallel_resistance, winding_layer, chan_inductor
 
 
 function interpolate_third_point(x1,y1,x2,y2, x3)
@@ -18,16 +18,16 @@ function find_nearest_spl_frequency_indices(spl::SpecificPowerLossData,f)
 end
 
 """
-    specificpowerloss(spl::SpecificPowerLossData, flux_density, frequency)
-    specificpowerloss(fp::FerriteProperties, flux_density, frequency)
-    specificpowerloss(m::Magnetics, flux_density, frequency)
-    specificpowerloss(t::Transformer, flux_density, frequency)
+    specific_power_loss(spl::SpecificPowerLossData, flux_density, frequency)
+    specific_power_loss(fp::FerriteProperties, flux_density, frequency)
+    specific_power_loss(m::Magnetics, flux_density, frequency)
+    specific_power_loss(t::Transformer, flux_density, frequency)
 
 Returns specific power loss.
 """
-specificpowerloss
+specific_power_loss
 
-function specificpowerloss(spl::SpecificPowerLossData, flux_density, f)
+function specific_power_loss(spl::SpecificPowerLossData, flux_density, f)
   # spl = tabulated specific power loss data from graph on datasheet
   # flux_density = magnetic field strength in Tesla
   # f = frequency in Hz
@@ -39,12 +39,12 @@ function specificpowerloss(spl::SpecificPowerLossData, flux_density, f)
                                     f_array[2],pv_array[2], f)
   return pv # specicic power loss (W/m^3) at flux_density, frequency f
 end
-specificpowerloss(fp::FerriteProperties, flux_density, f) =
-  specificpowerloss(fp.spl_hot,flux_density,f)
-specificpowerloss(m::Magnetics, flux_density::Float64, f::Float64)=
-  specificpowerloss(m.ferriteproperties,flux_density,f)
-specificpowerloss(t::Transformer, flux_density::Float64, f::Float64)=
-  specificpowerloss(t.magnetics,flux_density,f)
+specific_power_loss(fp::FerriteProperties, flux_density, f) =
+  specific_power_loss(fp.spl_hot,flux_density,f)
+specific_power_loss(m::Magnetics, flux_density::Float64, f::Float64)=
+  specific_power_loss(m.ferriteproperties,flux_density,f)
+specific_power_loss(t::Transformer, flux_density::Float64, f::Float64)=
+  specific_power_loss(t.magnetics,flux_density,f)
 
 
 """
@@ -77,6 +77,32 @@ flux_density(t::Transformer, coreloss::Float64, f::Float64) =
   flux_density(t.magnetics,coreloss,f)
 
 """
+    winding_layer(pcb :: PCB_Specification,
+                 isouter :: Bool,
+                 core :: CoreGeometry,
+                 number_of_turns :: Int)
+
+Create a `WindingLayer` for a specific core and PCB.
+"""
+function winding_layer(pcb :: PCB_Specification,
+                      isouter :: Bool,
+                      core :: CoreGeometry,
+                      number_of_turns :: Int)
+  trace_width = (core.winding_aperture-2*pcb.trace_edge_gap-
+    (number_of_turns-1)*pcb.trace_trace_gap)/number_of_turns
+  trace_length = 0.0
+  for i in 0:number_of_turns-1
+    r = core.half_center_width+pcb.trace_edge_gap+
+        0.5*trace_width+i*(trace_width+pcb.trace_trace_gap)
+    trace_length += 2π*r
+  end
+  trace_length += 2*core.center_length
+  trace_thickness =
+    isouter ? pcb.outer_copper_thickness : pcb.inner_copper_thickness
+  WindingLayer(trace_width, trace_length, trace_thickness, number_of_turns)
+end
+
+"""
     copper_weight_to_meters(oz)
 
 PCB copper thickness is typicaly given in ounces.  This function multiplies
@@ -85,14 +111,15 @@ by 0.48e-3 to give thickness in meters.
 copper_weight_to_meters(oz) = 0.48e-3*oz
 
 function conductivity(ρ_20, temperature_coefficient, temperature)
+  # todo: add skin effect
   ρ_20*(1 + temperature_coefficient*(temperature-20.0))
 end
-# todo: add skin effect
+
 
 """
-    turns(wl::WindingLayer)
-    turns(w::Winding)
-    turns(t::Transformer)
+    turns(windinglayer::WindingLayer)
+    turns(winding::Winding)
+    turns(transformer::Transformer)
 
 Number of turns, Array for `Transformer`.
 """
@@ -218,7 +245,7 @@ function equivalent_parallel_resistance(fp::FerriteProperties,
                                         ishot::Bool=true)
   flux_density = volts/(2.0*frequency*turns*effective_area)
   spldata = ishot?fp.spl_hot:fp.spl_room
-  spl = specificpowerloss(spldata,flux_density,frequency)
+  spl = specific_power_loss(spldata,flux_density,frequency)
   loss = spl*effective_volume
   volts^2/loss
 end
@@ -246,3 +273,21 @@ function equivalent_parallel_resistance(t::Transformer,
                                  turns,
                                  ishot)
 end
+
+"""
+    chan_inductor(ferriteproperties, effective_area, effective_length,ishot=true)
+    chan_inductor(magnetics, ishot=true)
+    chan_inductor(transformer, ishot=true)
+
+Parameters for LTspice Chan inductor to be used for magnetizing inductance.
+"""
+chan_inductor
+function chan_inductor(fp::FerriteProperties,
+                       effective_area,effective_length,ishot::Bool=true)
+  bh = ishot?fp.bh_hot:fp.bh_room
+  ChanInductor(bh.hc, bh.bs, bh.br, effective_area, effective_length,0.0, 1.0)
+end
+chan_inductor(m::Magnetics, ishot::Bool=true) =
+  chan_inductor(m.ferriteproperties, m.effective_area, m.effective_length,ishot)
+chan_inductor(t::Transformer, ishot::Bool=true) =
+  chan_inductor(t.magnetics, ishot)

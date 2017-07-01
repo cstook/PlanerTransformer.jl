@@ -1,10 +1,10 @@
 
 flux = 0.01 # Tesla
 frequency = 2e6 # Hz
-coreloss = specificpowerloss(ferrite_dict["3f4"],flux,frequency)
+coreloss = specific_power_loss(ferrite_dict["3f4"],flux,frequency)
 flux2 = flux_density(ferrite_dict["3f4"],coreloss,frequency)
 
-specificpowerloss(ferrite_dict["4f1"],0.01,1e6)
+specific_power_loss(ferrite_dict["4f1"],0.01,1e6)
 
 core = "e14"
 plate = "plt14"
@@ -37,14 +37,14 @@ input_3f3 = SplInput((
   ))
 
 spl_3f3 = SpecificPowerLossData(input_3f3)
-specificpowerloss(spl_3f3,0.06,300e3)*0.001
+specific_power_loss(spl_3f3,0.06,300e3)*0.001
 frequency = spl_3f3.frequency[3]
 (m,b) = spl_3f3.mb[3]
 m*0.06 +b
 
 using PlanerTransformer
 using Plots
-spl = specificpowerloss(ferrite_dict["3f3"],0.02,600e3)
+spl = specific_power_loss(ferrite_dict["3f3"],0.02,600e3)
 flux_density(ferrite_dict["3f3"],spl,600e3)
 
 material = ferrite_dict["3f4"]
@@ -70,10 +70,10 @@ pcb = PCB_Specification(trace_edge_gap,
 e_core = core_geometry_dict["e14"]
 plate = core_geometry_dict["plt14"]
 material = ferrite_dict["3f4"]
-layer1 = WindingLayer(pcb,true,e_core,3)
-layer2 = WindingLayer(pcb,false,e_core,2)
-layer3 = WindingLayer(pcb,false,e_core,2)
-layer4 = WindingLayer(pcb,true,e_core,3)
+layer1 = winding_layer(pcb,true,e_core,3)
+layer2 = winding_layer(pcb,false,e_core,2)
+layer3 = winding_layer(pcb,false,e_core,2)
+layer4 = winding_layer(pcb,true,e_core,3)
 primary = Winding(pcb,[layer1,layer4],false)
 secondary = Winding(pcb,[layer2,layer3],true)
 magnetics = Magnetics(material, [e_core,plate])
@@ -82,7 +82,7 @@ frequency = 1e6
 volts(transformer,450e3,frequency)
 tpd =TransformerPowerDissipation(transformer,[2.0,5.0],frequency)
 winding_resistance(transformer)
-ci = ChanInductor(transformer)
+ci = chan_inductor(transformer)
 PlanerTransformer.center_frequency(transformer)
 equivalent_parallel_resistance(transformer,.333,1e6)
 
@@ -104,8 +104,8 @@ pcb = PCB_Specification(trace_edge_gap,
 e_core = core_geometry_dict["e14"]
 plate = core_geometry_dict["plt14"]
 material = ferrite_dict["3f4"]
-layer1 = WindingLayer(pcb,true,e_core,1)
-layer2 = WindingLayer(pcb,true,e_core,1)
+layer1 = winding_layer(pcb,true,e_core,1)
+layer2 = winding_layer(pcb,true,e_core,1)
 primary = Winding(pcb,[layer1],false)
 secondary = Winding(pcb,[layer2],false)
 magnetics = Magnetics(material, [e_core,plate])
@@ -114,7 +114,7 @@ frequency = 1e6
 volts(transformer,450e3,frequency)
 tpd =TransformerPowerDissipation(transformer,[0.5,1.0],frequency)
 winding_resistance(transformer)
-ci = ChanInductor(transformer)
+ci = chan_inductor(transformer)
 PlanerTransformer.center_frequency(transformer)
 equivalent_parallel_resistance(transformer,0.5,1e6)
 

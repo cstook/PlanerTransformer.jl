@@ -4,7 +4,6 @@ export FerriteProperties
 export PCB_Specification, WindingLayer
 export Winding
 export Magnetics, Transformer
-export TransformerPowerDissipation, ChanInductor
 
 """
     CoreGeometry
@@ -209,31 +208,7 @@ struct WindingLayer
   number_of_turns :: Int
 end
 
-"""
-    WindingLayer(pcb :: PCB_Specification,
-                 isouter :: Bool,
-                 core :: CoreGeometry,
-                 number_of_turns :: Int)
 
-Create a `WindingLayer` for a specific core and PCB.
-"""
-function WindingLayer(pcb :: PCB_Specification,
-                      isouter :: Bool,
-                      core :: CoreGeometry,
-                      number_of_turns :: Int)
-  trace_width = (core.winding_aperture-2*pcb.trace_edge_gap-
-    (number_of_turns-1)*pcb.trace_trace_gap)/number_of_turns
-  trace_length = 0.0
-  for i in 0:number_of_turns-1
-    r = core.half_center_width+pcb.trace_edge_gap+
-        0.5*trace_width+i*(trace_width+pcb.trace_trace_gap)
-    trace_length += 2π*r
-  end
-  trace_length += 2*core.center_length
-  trace_thickness =
-    isouter ? pcb.outer_copper_thickness : pcb.inner_copper_thickness
-  WindingLayer(trace_width, trace_length, trace_thickness, number_of_turns)
-end
 
 """
     Winding(pcb::PCB_Specification,
@@ -284,7 +259,7 @@ struct Magnetics
     mass = 0.0
     for i in eachindex(cores)
       if effective_area != cores[i].effective_area
-        throw(ArgumentError("effective area of all cores nust be the same"))
+        throw(ArgumentError("effective area of all cores must be the same"))
       end
       effective_volume += cores[i].effective_volume
       effective_length += cores[i].effective_length
@@ -310,69 +285,6 @@ struct Transformer
   end
 end
 
-"""
-    TransformerPowerDissipation(t::Transformer, input::Array{Float64,1}, frequency)
-
-Computes power dissipation of transformer.
-
-The first element of the input array is the peak to peak voltage applied to the
-first winding.  The following elements are the load currents in the output
-windings.  Returns a `TransformerPowerDissipation` object.
-
-**Fields**
-- `transformer`             -- from input
-- `frequency`               -- from input
-- `flux_density`            -- peak flux density (Tesla)
-- `winding_voltage`         -- peak to peak voltage on each winding
-- `core_specific_power`     -- power dissipated in core (W/m^3)
-- `core_total_power`        -- power dissipated in core (W)
-- `winding_power`           -- power dissipated in each winding (W)
-- `total_power`             -- `core_total_power +sum(winding_power)`
-"""
-struct TransformerPowerDissipation
-  transformer :: Transformer
-  frequency :: Float64
-  flux_density ::Float64
-  winding_voltage :: Array{Float64,1}
-  core_specific_power :: Float64
-  core_total_power :: Float64
-  winding_power :: Array{Float64,1}
-  total_power :: Float64
-  function TransformerPowerDissipation(t::Transformer, input::Array{Float64,1}, frequency)
-    # input = [Vin, Iout, Iout, ...]
-    # first winding is always input
-    if length(t.windings) != length(input)
-      throw(ArgumentError("length of input array must equal number of windings"))
-    end
-    v1 = input[1]
-    flux_density = v1/(2*frequency*t.windings[1].turns*t.magnetics.effective_area)
-    core_specific_power = specificpowerloss(t,flux_density,frequency)
-    core_total_power = t.magnetics.effective_volume * core_specific_power
-    winding_voltage = [v1*t.windings[i].turns/t.windings[1].turns for i in eachindex(t.windings)]
-    winding_power = similar(input)
-    for i in 2:length(t.windings)
-      winding_power[i] = input[i]^2*winding_resistance(t.windings[i])
-    end
-    p = sum(winding_power[2:end])+core_total_power+sum(input[2:end].*winding_voltage[2:end])
-    r1 = winding_resistance(t.windings[1])
-    winding_power[1] = 0.0
-    i1 = 0.0
-    i1previous = 0.0
-    for i in 1:10
-      pbetter = p+winding_power[1]
-      i1 = pbetter/v1
-      if abs(i1-i1previous)<=eps()
-        break
-      end
-      i1previous = i1
-      winding_power[1] = i1^2*r1
-    end
-    total_power = core_total_power + sum(winding_power)
-    new(t, frequency, flux_density, winding_voltage, core_specific_power,
-        core_total_power, winding_power, total_power)
-  end
-end
-
 struct ChanInductor
   hc :: Float64
   bs :: Float64
@@ -382,15 +294,6 @@ struct ChanInductor
   lg :: Float64
   n :: Float64
 end
-function ChanInductor(fp::FerriteProperties, effective_area::Float64,
-                      effective_length::Float64,ishot=true)
-  bh = ishot?fp.bh_hot:fp.bh_room
-  ChanInductor(bh.hc, bh.bs, bh.br, effective_area, effective_length,0.0, 1.0)
-end
-ChanInductor(m::Magnetics, ishot=true) =
-  ChanInductor(m.ferriteproperties, m.effective_area, m.effective_length,ishot)
-ChanInductor(t::Transformer, ishot=true) =
-  ChanInductor(t.magnetics, ishot)
 function Base.show(io::IO,ci::ChanInductor)
   println(io,"Hc=",ci.hc,", Bs=",ci.bs,", Br=",ci.br,", A=",
           ci.a,", Lm=",ci.lm,", Lg=",ci.lg,", N=",ci.n)

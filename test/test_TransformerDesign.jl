@@ -29,10 +29,10 @@ pcb = PCB_Specification(trace_edge_gap,
 e_core = core_geometry_dict["e14"]
 plate = core_geometry_dict["plt14"]
 material = ferrite_dict["3f4"]
-layer1 = WindingLayer(pcb,true,e_core,3)
-layer2 = WindingLayer(pcb,false,e_core,2)
-layer3 = WindingLayer(pcb,false,e_core,2)
-layer4 = WindingLayer(pcb,true,e_core,3)
+layer1 = winding_layer(pcb,true,e_core,3)
+layer2 = winding_layer(pcb,false,e_core,2)
+layer3 = winding_layer(pcb,false,e_core,2)
+layer4 = winding_layer(pcb,true,e_core,3)
 primary = Winding(pcb,[layer1,layer4],false)
 secondary = Winding(pcb,[layer2,layer3],true)
 magnetics = Magnetics(material, [e_core,plate])
@@ -40,7 +40,7 @@ transformer = Transformer(magnetics,[primary,secondary])
 v = volts(transformer,150e3,500e3)
 @test v[1]≈2.2455612451812534
 @test v[2]≈2.9940816602416715
-ci = ChanInductor(transformer)
+ci = chan_inductor(transformer)
 @test ci.hc ≈ 50.0
 @test ci.bs ≈ 0.345
 @test ci.br ≈ 0.14
