@@ -16,6 +16,7 @@ winding_resistance
 TransformerPowerDissipation
 volt_seconds_per_turn
 volt_seconds
+equivalent_parallel_resistance
 volts_per_turn
 specificpowerloss
 flux_density
