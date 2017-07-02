@@ -1,12 +1,7 @@
-# Interface
-
+# Design
 ```@docs
 PCB_Specification
 copper_weight_to_meters
-CoreGeometry
-FerriteProperties
-BHloop
-SpecificPowerLossData
 WindingLayer
 winding_layer
 Winding
@@ -22,5 +17,4 @@ chan_inductor
 volts_per_turn
 specific_power_loss
 flux_density
-SplInput
 ```

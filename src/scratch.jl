@@ -142,14 +142,4 @@ include("make.jl")
 # E14/3.5/5/R-3F4
 # PLT14/5/1.5/S-3F4
 using PlanerTransformer
-magnetics_er20 = PlanerTransformer.Magnetics_ER_Input(33.2,59,1960,10.2,18,8.8)
-CoreGeometry(magnetics_er20)
-
-
-
-
-
-
-
-
-core_geometry_dict["er20"]
+core_geometry_dict["i20"]

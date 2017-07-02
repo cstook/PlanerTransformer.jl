@@ -1,8 +1,12 @@
 using Documenter, PlanerTransformer
 
 const PAGES = [
-  "Home" => "index.md"
-  "API" => "api.md"
+  "Home" => "index.md",
+  "Installation" => "install.md",
+  "Introduction" => "introduction.md",
+  "Design API" => "design_api.md",
+  "Data Entry API" => "data_entry_api.md",
+  "API index" => "APIindex.md",
 ]
 
 makedocs(
