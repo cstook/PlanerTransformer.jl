@@ -1,5 +1,5 @@
 @testset "TransformerDesign" begin
-test_spldata = SplInput((
+test_spldata = PlanerTransformer.SplInput((
   25e3,(100,14),(300,270),
   100e3,(62,20,),(240,750),
   200e3,(38,8),(190,1100),

@@ -1,5 +1,5 @@
 export CoreGeometry
-export BHloop, SplInput, SpecificPowerLossData
+export BHloop, SpecificPowerLossData
 export FerriteProperties
 export PCB_Specification, WindingLayer
 export Winding
@@ -78,49 +78,6 @@ struct SpecificPowerLossData
     end
     new(frequency,mb)
   end
-end
-
-"""
-    SplInput(data::Tuple)
-
-Simplify manual input of specific power loss data.
-
-Data format is as follows.
-(f1,(x1,y1),(x2,y2), f2,(x3,y3),(x4,y4), ...)
-
-**Elements of Tuple**
-- fn    -- frequency (Hz)
-- xn    -- flux density (mT)
-- yn    -- specific power loss (Kw/m^3)
-
-The only purpose of this object is to pass to `SpecificPowerLossData`.  Data is
-converted to MKS units there.
-"""
-struct SplInput
-  data :: Tuple
-end
-
-function SpecificPowerLossData(input::SplInput)
-    data=input.data
-    l = length(data)
-    if mod(l,3)!=0
-      throw(ArgumentError("incorrect input length"))
-    end
-    output_length = div(l,3)
-    frequency = ntuple(x->data[x*3-2],output_length)
-    function slope_offset(x)
-      i = x*3-2
-      (f,(x1,y1),(x2,y2)) = data[i:i+2]
-      x1 = log10(0.001*x1) # convert mT to T
-      x2 = log10(0.001*x2) # convert mT to T
-      y1 = log10(1000.0*y1) # convert kW/m^3 to W/m^3
-      y2 = log10(1000.0*y2) # convert kW/m^3 to W/m^3
-      m = (y2-y1)/(x2-x1)
-      b = y1-m*x1
-      (m,b)
-    end
-    mb = ntuple(slope_offset, output_length)
-    SpecificPowerLossData(frequency,mb)
 end
 
 """

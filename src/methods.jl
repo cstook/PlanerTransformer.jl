@@ -279,7 +279,8 @@ end
     chan_inductor(magnetics, ishot=true)
     chan_inductor(transformer, ishot=true)
 
-Parameters for LTspice Chan inductor to be used for magnetizing inductance.
+Parameters for LTspice [Chan inductor](http://ltwiki.org/?title=The_Chan_model)
+to be used for magnetizing inductance.
 """
 chan_inductor
 function chan_inductor(fp::FerriteProperties,
