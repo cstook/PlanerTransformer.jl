@@ -60,6 +60,7 @@ Direct entry of Magnetics ER core values from datasheet.
 - `f`                   -- mm
 """
 struct Magnetics_ER_Input
+  name :: String
   effective_length :: Float64
   effective_area :: Float64
   effective_volume :: Float64
@@ -79,7 +80,7 @@ function CoreGeometry(x::Magnetics_ER_Input)
   effective_volume = x.effective_volume * 1e-9 # mm^3 to m^3
   effective_area = x.effective_area * 1e-6 # mm^2 to m^2
   mass = x.mass * 1e-3 # g to Kg
-  CoreGeometry(winding_aperture, half_center_width, center_length,
+  CoreGeometry(x.name, winding_aperture, half_center_width, center_length,
                effective_volume, effective_area, effective_length, mass)
 end
 
@@ -95,6 +96,7 @@ Direct entry of Magnetics I core values from datasheet.
 - `mass`                -- g
 """
 struct Magnetics_I_Input
+  name :: String
   effective_length :: Float64
   effective_area :: Float64
   effective_volume :: Float64
@@ -110,6 +112,6 @@ function CoreGeometry(x::Magnetics_I_Input)
   effective_volume = x.effective_volume * 1e-9 # mm^3 to m^3
   effective_area = x.effective_area * 1e-6 # mm^2 to m^2
   mass = x.mass * 1e-3 # g to Kg
-  CoreGeometry(winding_aperture, half_center_width, center_length,
+  CoreGeometry(x.name, winding_aperture, half_center_width, center_length,
                effective_volume, effective_area, effective_length, mass)
 end

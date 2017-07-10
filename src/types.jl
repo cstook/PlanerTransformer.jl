@@ -9,6 +9,7 @@ export Magnetics, Transformer
     CoreGeometry
 
 **Fields**
+- `name`                -- string identifying the core
 - `winding_aperture`    -- m
 - `half_center_width`   -- m
 - `center_length`       -- m
@@ -19,6 +20,7 @@ export Magnetics, Transformer
 """
 struct CoreGeometry
   # all values are in MKS units
+  name :: String
   winding_aperture :: Float64
   half_center_width :: Float64  # center_radius for ER
   center_length :: Float64
@@ -86,6 +88,7 @@ end
 Store material data.
 
 **Fields**
+- `name`              -- string identifying the ferrite
 - `fmin`              -- minimum recommended operating frequency
 - `fmax`              -- maximum recommended operating frequency
 - `troom`             -- typicaly 25C
@@ -95,6 +98,7 @@ Store material data.
 - `spl_hot`           -- specfic power loss data at hot temperature
 """
 struct FerriteProperties
+  name :: String
   fmin :: Float64
   fmax :: Float64
   troom :: Float64
@@ -115,7 +119,7 @@ end
 
 Store PCB data.
 
-** Fields **
+**Fields**
 - `trace_edge_gap`          -- minimum distance from trace to PCB edge (m)
 - `trace_trace_gap`         -- minimum distance between traces (m)
 - `outer_copper_thickness`  -- thickness of top and bottom copper layers (m)

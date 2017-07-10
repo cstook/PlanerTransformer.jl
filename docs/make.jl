@@ -22,6 +22,10 @@ makedocs(
 )
 
 if "deploy" in ARGS
+  fake_travis = "C:/Users/Chris/fake_travis_PlanerTransformer.jl"
+  if isfile(fake_travis)
+    include(fake_travis)
+  end
   deploydocs(
     repo = "github.com/cstook/PlanerTransformer.jl.git",
     target = "site",
