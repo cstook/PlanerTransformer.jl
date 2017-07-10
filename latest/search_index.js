@@ -61,7 +61,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Design API",
     "title": "PlanerTransformer.PCB_Specification",
     "category": "Type",
-    "text": "PCB_Specification(trace_edge_gap,\n                  trace_trace_gap,\n                  outer_copper_thickness,\n                  inner_copper_thickness = 0.0,\n                  number_of_layers = 2,\n                  ρ_20=1.68e-8,\n                  temperature_coefficient=0.003862)\n\nStore PCB data.\n\n** Fields **\n\ntrace_edge_gap          – minimum distance from trace to PCB edge (m)\ntrace_trace_gap         – minimum distance between traces (m)\nouter_copper_thickness  – thickness of top and bottom copper layers (m)\ninner_copper_thickness  – thickness of inner copper layers (m)\nnumber_of_layers        – number of copper layers\nρ_20                    – conductivity, default to 1.68e-8 Ωm for Cu @ 20C\ntemperature_coefficient – default to 0.003862 1/K for Cu\n\n\n\n"
+    "text": "PCB_Specification(trace_edge_gap,\n                  trace_trace_gap,\n                  outer_copper_thickness,\n                  inner_copper_thickness = 0.0,\n                  number_of_layers = 2,\n                  ρ_20=1.68e-8,\n                  temperature_coefficient=0.003862)\n\nStore PCB data.\n\nFields\n\ntrace_edge_gap          – minimum distance from trace to PCB edge (m)\ntrace_trace_gap         – minimum distance between traces (m)\nouter_copper_thickness  – thickness of top and bottom copper layers (m)\ninner_copper_thickness  – thickness of inner copper layers (m)\nnumber_of_layers        – number of copper layers\nρ_20                    – conductivity, default to 1.68e-8 Ωm for Cu @ 20C\ntemperature_coefficient – default to 0.003862 1/K for Cu\n\n\n\n"
 },
 
 {
@@ -213,7 +213,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Entry API",
     "title": "PlanerTransformer.CoreGeometry",
     "category": "Type",
-    "text": "CoreGeometry\n\nFields\n\nwinding_aperture    – m\nhalf_center_width   – m\ncenter_length       – m\neffective_volume    – m^3\neffective_area      – m^2\neffective_length    – m\nmass                – Kg\n\n\n\n"
+    "text": "CoreGeometry\n\nFields\n\nname                – string identifying the core\nwinding_aperture    – m\nhalf_center_width   – m\ncenter_length       – m\neffective_volume    – m^3\neffective_area      – m^2\neffective_length    – m\nmass                – Kg\n\n\n\n"
 },
 
 {
@@ -221,7 +221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Entry API",
     "title": "PlanerTransformer.FerriteProperties",
     "category": "Type",
-    "text": "FerriteProperties(frequency_range, troom, thot, bh_room, bh_hot, spl_hot)\n\nStore material data.\n\nFields\n\nfmin              – minimum recommended operating frequency\nfmax              – maximum recommended operating frequency\ntroom             – typicaly 25C\nthot              – typicaly 100C\nbh_room           – BH loop at room temperature\nbh_hot            – BH loop at hot temperature\nspl_hot           – specfic power loss data at hot temperature\n\n\n\n"
+    "text": "FerriteProperties(frequency_range, troom, thot, bh_room, bh_hot, spl_hot)\n\nStore material data.\n\nFields\n\nname              – string identifying the ferrite\nfmin              – minimum recommended operating frequency\nfmax              – maximum recommended operating frequency\ntroom             – typicaly 25C\nthot              – typicaly 100C\nbh_room           – BH loop at room temperature\nbh_hot            – BH loop at hot temperature\nspl_hot           – specfic power loss data at hot temperature\n\n\n\n"
 },
 
 {
