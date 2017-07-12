@@ -11,7 +11,7 @@ pcb = PCB_Specification(trace_edge_gap,
                         inner_copper_thickness,
                         number_of_layers)
 
-core = core_geometry_dict["e14"]
+core = core_geometry_dict["e14_set"]
 layer1 = winding_layer(pcb,true,core,3)
 layer2 = winding_layer(pcb,false,core,3)
 layer3 = winding_layer(pcb,false,core,3)

@@ -228,6 +228,9 @@ struct Magnetics
     end
     new(fp,cores,effective_volume,effective_area,effective_length,mass)
   end
+  function Magnetics(fp::FerriteProperties,core::CoreGeometry)
+    new(fp, [core], core.effective_volume, core.effective_area, core.effective_length, core.mass)
+  end
 end
 
 """

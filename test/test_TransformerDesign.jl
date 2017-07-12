@@ -10,7 +10,7 @@ test_fp = FerriteProperties("3f3",0.2e6,0.5e6,25,100,
                             BHloop(15,.44,.15),
                             BHloop(10,.345,.120),
                             SpecificPowerLossData(test_spldata)) # 3f3
-test_cg = CoreGeometry("e14", 4e-3,     1.5e-3,   5e-3, 300e-9, 14.5e-6, 16.7e-3, 0.6e-3) # e14
+test_cg = CoreGeometry("e14_set", 4e-3,     1.5e-3,   5e-3, 300e-9, 14.5e-6, 16.7e-3, 0.6e-3) # e14
 @test volt_seconds_per_turn(2.0,3.0)≈6.0
 @test volt_seconds_per_turn(test_cg,2.0) ≈ 14.5e-6*2.0
 @test volts_per_turn(test_fp, test_cg, 150e3, 500e3) ≈ 0.6005999150244018
@@ -26,8 +26,8 @@ pcb = PCB_Specification(trace_edge_gap,
                         inner_copper_thickness,
                         number_of_layers)
 
-e_core = core_geometry_dict["e14"]
-plate = core_geometry_dict["plt14"]
+e_core = core_geometry_dict["e14_set"]
+plate = core_geometry_dict["e14_plt"]
 material = ferrite_dict["3f4"]
 layer1 = winding_layer(pcb,true,e_core,3)
 layer2 = winding_layer(pcb,false,e_core,2)
@@ -45,10 +45,10 @@ ci = chan_inductor(transformer)
 @test ci.bs ≈ 0.345
 @test ci.br ≈ 0.14
 @test ci.a ≈ 1.45e-5
-@test ci.lm ≈ 0.0334
+@test ci.lm ≈ 0.0374
 @test ci.lg ≈ 0.0
 @test ci.n ≈ 1.0
-testshow(ci,"Hc=50.0, Bs=0.345, Br=0.14, A=1.45e-5, Lm=0.0334, Lg=0.0, N=1.0\n")
+testshow(ci,"Hc=50.0, Bs=0.345, Br=0.14, A=1.45e-5, Lm=0.0374, Lg=0.0, N=1.0\n")
 
 winding_resistance_array = winding_resistance(transformer)
 @test winding_resistance_array[1] ≈ 0.0015265864267914595
@@ -63,7 +63,7 @@ power = TransformerPowerDissipation(transformer, [2.0,5.0], 1e6)
 @test equivalent_parallel_resistance(transformer,2.5) ≈ 6.225241410660698
 
 
-wrong_plate = core_geometry_dict["plt18"]
+wrong_plate = core_geometry_dict["e18_plt"]
 @test_throws ArgumentError Magnetics(material, [e_core, wrong_plate])
 @test_throws ArgumentError Transformer(magnetics, [primary])
 @test_throws ArgumentError TransformerPowerDissipation(transformer, [2.4], 1e6)
