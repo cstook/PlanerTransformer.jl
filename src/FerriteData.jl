@@ -38,7 +38,7 @@ spldata_4f1 = SplInput((
   ))
 
 
-ferrite_dict = Dict(
+const ferrite_dict = Dict(
   "3f3" => FerriteProperties("3f3",0.2e6,0.5e6,25,100,
                              BHloop(15,.44,.15),
                              BHloop(10,.345,.120),

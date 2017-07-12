@@ -1,7 +1,7 @@
 export core_geometry_dict
 
 
-core_geometry_dict = Dict(
+const core_geometry_dict = Dict(
   #  Ferrocube data
   "e14_set"=> CoreGeometry("e14_set", 4e-3,     1.5e-3,   5e-3, 300e-9, 14.5e-6, 20.7e-3, 0.6e-3*2.0),
   "e18_set"=> CoreGeometry("e18_set", 5e-3,     2e-3,     10e-3, 960e-9, 39.5e-6, 24.3e-3, 2.4e-3*2.0),
@@ -29,11 +29,11 @@ core_geometry_dict = Dict(
   "er25/8_set"=>CoreGeometry(Magnetics_ER_Input("er25/8_set",41.4, 100, 4145, 22.0, 22.0, 11.0)),
   "er30_set"=>CoreGeometry(Magnetics_ER_Input("er30_set",46.0, 108, 4970, 26.4, 26.0, 11.0)),
   "er32_set"=>CoreGeometry(Magnetics_ER_Input("er32_set",38.2, 141, 5400, 27.5, 27.2, 12.4)),
-  "er12.5_plt"=>CoreGeometry(Magnetics_I_Input("i12.5",15.9, 19.8, 315, 1)),
-  "er18_plt"=>CoreGeometry(Magnetics_I_Input("i18",20.3, 40.1, 813, 3.9)),
-  "er20_plt"=>CoreGeometry(Magnetics_I_Input("i20",22.5, 57.3, 1460, 8)),
-  "er22_plt"=>CoreGeometry(Magnetics_I_Input("i22",35.1, 130, 4560, 22)),
-  "er25/5.5_plt"=>CoreGeometry(Magnetics_I_Input("i25",26.4, 89.7, 2370, 13.1)), #mate with ER 25/5.5/18
-  "er30_plt"=>CoreGeometry(Magnetics_I_Input("i30",36.2, 108, 3910, 20.8)),
-  "er32_plt"=>CoreGeometry(Magnetics_I_Input("i32",35.1, 130, 4560, 22)),
+
+  "er12.5_plt"=>CoreGeometry(Magnetics_ER_Input("er12.5_plt",15.9, 19.8, 315, 1, 11.2, 5.0)),
+  "er18_plt"=>CoreGeometry(Magnetics_ER_Input("er18_plt",20.3, 40.1, 813, 3.9, 15.6, 6.2)),
+  "er20_plt"=>CoreGeometry(Magnetics_ER_Input("er20_plt",22.5, 57.3, 1460, 8, 18, 8.8)),
+  "er25/5.5_plt"=>CoreGeometry(Magnetics_ER_Input("er25_plt",26.4, 89.7, 2370, 13.1, 22.0, 11.0)), #mate with ER 25/5.5/18
+  "er30_plt"=>CoreGeometry(Magnetics_ER_Input("er30_plt",36.2, 108, 3910, 20.8, 26.0, 11.0)),
+  "er32_plt"=>CoreGeometry(Magnetics_ER_Input("er32_plt",35.1, 130, 4560, 22, 27.2, 12.4)),
   )

@@ -10,8 +10,9 @@ pcb = PCB_Specification(trace_edge_gap,
                         inner_copper_thickness,
                         number_of_layers)
 core_geometry_dict
-my_geometry_list = ["e14_plt","e18_plt","e22_plt","e32_plt","e58_plt","e64_plt"]
-my_ferrite_list = ["3f5"]#["3f4","3f45","3f5"];
+my_geometry_list = ["er12.5_plt","er18_plt","er20_plt","er25/5.5_plt","er30_plt","er32_plt"]
+#my_geometry_list = ["e14_plt","e18_plt","e22_plt","e32_plt","e58_plt","e64_plt"]
+my_ferrite_list = ["3f4"]#["3f4","3f45","3f5"];
 my_ferrites = getindex.(ferrite_dict,my_ferrite_list)
 my_cores = [getindex.(core_geometry_dict,x) for x in my_geometry_list]
 my_magnetics = [Magnetics(y,x) for x in my_cores, y in my_ferrites]
@@ -29,9 +30,9 @@ for x in eachindex(my_cores)
     end
   end
 end
-frequency = 1e6  # Hz
+frequency = 3e6  # Hz
 spl_max = 450e3
-primary_voltage_pp = 10.0
+primary_voltage_pp = 20.0
 output_current_pp = 5.0 # W/m^3
 function power_inf(tpd::TransformerPowerDissipation,spl_max)
   tpd.core_specific_power<spl_max ? tpd.total_power : Inf
@@ -57,4 +58,17 @@ tdp[i]
 total_power[:,1,:]
 
 
+
+
+
+
+
 core_total_power[:,1,:]
+
+
+
+
+
+
+
+# fjfjfjfjfj

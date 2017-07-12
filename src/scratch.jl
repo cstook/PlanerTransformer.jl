@@ -162,3 +162,16 @@ winding_aperture(g)
 
 
 fieldnames(CoreGeometry)
+
+
+core_geometry_dict["er12.5_plt"]
+
+
+
+
+
+
+
+
+
+# fff
