@@ -49,10 +49,12 @@ core_total_power = core_power_inf.(tdp,spl_max)
 (v,i) = findmin(core_total_power)
 (v,i) = findmin(total_power)
 println(transformer[i].magnetics.ferriteproperties.name)
-println(transformer[i].magnetics.cores[1].name)
+println(transformer[i].magnetics.core.name)
 println(transformer[i].windings[1].turns)
 println(transformer[i].windings[2].turns)
 println(tdp[i].total_power)
 tdp[i]
 total_power[:,1,:]
+
+
 core_total_power[:,1,:]

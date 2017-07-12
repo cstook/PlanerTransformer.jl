@@ -35,7 +35,7 @@ layer3 = winding_layer(pcb,false,e_core,2)
 layer4 = winding_layer(pcb,true,e_core,3)
 primary = Winding(pcb,[layer1,layer4],false)
 secondary = Winding(pcb,[layer2,layer3],true)
-magnetics = Magnetics(material, [e_core,plate])
+magnetics = Magnetics(material, e_core)
 transformer = Transformer(magnetics,[primary,secondary])
 v = volts(transformer,150e3,500e3)
 @test v[1]≈2.2455612451812534
@@ -45,27 +45,21 @@ ci = chan_inductor(transformer)
 @test ci.bs ≈ 0.345
 @test ci.br ≈ 0.14
 @test ci.a ≈ 1.45e-5
-@test ci.lm ≈ 0.0374
+@test ci.lm ≈ 0.0207
 @test ci.lg ≈ 0.0
 @test ci.n ≈ 1.0
-testshow(ci,"Hc=50.0, Bs=0.345, Br=0.14, A=1.45e-5, Lm=0.0374, Lg=0.0, N=1.0\n")
+testshow(ci,"Hc=50.0, Bs=0.345, Br=0.14, A=1.45e-5, Lm=0.0207, Lg=0.0, N=1.0\n")
 
 winding_resistance_array = winding_resistance(transformer)
 @test winding_resistance_array[1] ≈ 0.0015265864267914595
 @test winding_resistance_array[2] ≈ 0.0027866178802512884
 power = TransformerPowerDissipation(transformer, [2.0,5.0], 1e6)
 @test power.flux_density ≈ 0.022988505747126436
-@test power.total_power ≈ 0.17442287749060426
+@test power.total_power ≈0.15865040116229484
 @test flux_density(magnetics,150e3,1e6) ≈ 0.031109516217764782
 @test volt_seconds_per_turn(magnetics, 0.03) ≈ 4.3499999999999996e-7
 @test volts_per_turn(magnetics, 150e3, 1e6) ≈ 0.9021759703151787
 @test volts(primary,magnetics,150e3,1e6) ≈ 2.7065279109455362
-@test equivalent_parallel_resistance(transformer,2.5) ≈ 6.225241410660698
-
-
-wrong_plate = core_geometry_dict["e18_plt"]
-@test_throws ArgumentError Magnetics(material, [e_core, wrong_plate])
-@test_throws ArgumentError Transformer(magnetics, [primary])
-@test_throws ArgumentError TransformerPowerDissipation(transformer, [2.4], 1e6)
+@test equivalent_parallel_resistance(transformer,2.5) ≈ 11.205434539189257
 
 end # testset

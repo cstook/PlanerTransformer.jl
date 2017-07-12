@@ -35,9 +35,9 @@ struct TransformerPowerDissipation
       throw(ArgumentError("length of input array must equal number of windings"))
     end
     v1 = input[1]
-    flux_density = v1/(2*frequency*t.windings[1].turns*t.magnetics.effective_area)
+    flux_density = v1/(2*frequency*t.windings[1].turns*effective_area(t.magnetics.core))
     core_specific_power = specific_power_loss(t,flux_density,frequency)
-    core_total_power = t.magnetics.effective_volume * core_specific_power
+    core_total_power = effective_volume(t.magnetics.core) * core_specific_power
     winding_voltage = [v1*t.windings[i].turns/t.windings[1].turns for i in eachindex(t.windings)]
     winding_power = similar(input)
     for i in 2:length(t.windings)

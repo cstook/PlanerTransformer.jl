@@ -208,29 +208,7 @@ All magnetic information for `Transformer` in one object.
 """
 struct Magnetics
   ferriteproperties :: FerriteProperties
-  cores :: Array{CoreGeometry,1}
-  effective_volume :: Float64
-  effective_area :: Float64
-  effective_length :: Float64
-  mass :: Float64
-  function Magnetics(fp::FerriteProperties,cores::Array{CoreGeometry,1})
-    effective_area = cores[1].effective_area
-    effective_volume = 0.0
-    effective_length = 0.0
-    mass = 0.0
-    for i in eachindex(cores)
-      if effective_area != cores[i].effective_area
-        throw(ArgumentError("effective area of all cores must be the same"))
-      end
-      effective_volume += cores[i].effective_volume
-      effective_length += cores[i].effective_length
-      mass += cores[i].mass
-    end
-    new(fp,cores,effective_volume,effective_area,effective_length,mass)
-  end
-  function Magnetics(fp::FerriteProperties,core::CoreGeometry)
-    new(fp, [core], core.effective_volume, core.effective_area, core.effective_length, core.mass)
-  end
+  core :: CoreGeometry
 end
 
 """

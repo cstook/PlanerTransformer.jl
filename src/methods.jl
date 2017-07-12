@@ -67,7 +67,7 @@ function flux_density(spl::SpecificPowerLossData, coreloss::Float64, f::Float64)
   b_array = [(log10(coreloss)-spl.mb[i][2])/spl.mb[i][1] for i in indexrange]
   b = 10^interpolate_third_point(f_array[1],b_array[1],
                               f_array[2],b_array[2], f)
-  return b # magametic field strength in Tesla
+  return b # magnetic field strength in Tesla
 end
 flux_density(fp::FerriteProperties, coreloss::Float64, f::Float64) =
   flux_density(fp.spl_hot,coreloss,f)
@@ -123,21 +123,6 @@ end
 
 Number of turns, Array for `Transformer`.
 """
-turns
-
-turns(wl::WindingLayer) = wl.turns
-#=
-function turns(w::Winding)
-  if w.isseries
-    t = 0
-    for i in eachindex(w.windinglayers)
-      t += turns(w.windinglayers[i])
-    end
-    return t
-  end
-  return w.windinglayers[1].turns
-end
-=#
 turns(t::Transformer) = turns.(t.windings)
 
 """
@@ -153,7 +138,7 @@ volt_seconds_per_turn(effective_area, flux_density_pp) =
 volt_seconds_per_turn(cg::CoreGeometry, flux_density_pp) =
   volt_seconds_per_turn(cg.effective_area, flux_density_pp)
 volt_seconds_per_turn(m::Magnetics, flux_density_pp) =
-  volt_seconds_per_turn(m.effective_area, flux_density_pp)
+  volt_seconds_per_turn(m.core, flux_density_pp)
 volt_seconds_per_turn(t::Transformer, flux_density_pp) =
   volt_seconds_per_turn(t.magnetics, flux_density_pp)
 
@@ -188,7 +173,7 @@ function volts_per_turn(fp::FerriteProperties,
   volts_per_turn(fp,cg.effective_area,loss_limit,frequency)
 end
 volts_per_turn(m::Magnetics, loss_limit::Float64, frequency::Float64) =
-  volts_per_turn(m.ferriteproperties, m.effective_area, loss_limit, frequency)
+  volts_per_turn(m.ferriteproperties, m.core, loss_limit, frequency)
 volts_per_turn(t::Transformer, loss_limit::Float64, frequency::Float64) =
   volts_per_turn(t.magnetics, loss_limit, frequency)
 
@@ -257,8 +242,8 @@ function equivalent_parallel_resistance(m::Magnetics,
                                         turns=1,
                                         ishot::Bool=true)
   equivalent_parallel_resistance(m.ferriteproperties,
-                                 m.effective_area,
-                                 m.effective_volume,
+                                 effective_area(m.core),
+                                 effective_volume(m.core),
                                  volts,
                                  frequency,
                                  turns,
@@ -291,6 +276,6 @@ function chan_inductor(fp::FerriteProperties,
   ChanInductor(bh.hc, bh.bs, bh.br, effective_area, effective_length,0.0, 1.0)
 end
 chan_inductor(m::Magnetics, ishot::Bool=true) =
-  chan_inductor(m.ferriteproperties, m.effective_area, m.effective_length,ishot)
+  chan_inductor(m.ferriteproperties, effective_area(m.core), effective_length(m.core),ishot)
 chan_inductor(t::Transformer, ishot::Bool=true) =
   chan_inductor(t.magnetics, ishot)
