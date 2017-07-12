@@ -9,7 +9,7 @@ specific_power_loss(ferrite_dict["4f1"],0.01,1e6)
 core = "e14"
 plate = "plt14"
 material = "3f4"
-number_of_turns = 4 # per layer
+turns = 4 # per layer
 trace_edge_gap = 0.16e-3
 trace_trace_gap = 0.13e-3
 thickness = copper_weight_to_meters(1.0) # oz
@@ -20,7 +20,7 @@ flux_density_pp = 2*flux_density_peak
 vst = volt_seconds_per_turn(core_geometry_dict[core],flux_density_pp)
 vt = volts_per_turn(core_geometry_dict[core],ferrite_dict[material],loss_limit,frequency)
 r = winding_resistance(Winding(core_geometry_dict[core],
-                       number_of_turns,
+                       turns,
                        trace_edge_gap,
                        trace_trace_gap,
                        thickness))
@@ -142,4 +142,23 @@ include("make.jl")
 # E14/3.5/5/R-3F4
 # PLT14/5/1.5/S-3F4
 using PlanerTransformer
-core_geometry_dict["i20"]
+g = core_geometry_dict["i20"]
+ex1 = :($(fieldnames(CoreGeometry)[1])(x::CoreGeometry) = x.$(fieldnames(CoreGeometry)[1]))
+ex2 = :($(fieldnames(CoreGeometry)[2])(x::CoreGeometry) = x.$(fieldnames(CoreGeometry)[2]))
+
+eval(ex)
+
+name(g)
+
+function functionalize_fieldnames(x)
+  for field in fieldnames(x)
+    @eval $field(y::$x) = y.$field
+  end
+end
+
+functionalize_fieldnames(CoreGeometry)
+name(g)
+winding_aperture(g)
+
+
+fieldnames(CoreGeometry)

@@ -80,18 +80,18 @@ flux_density(t::Transformer, coreloss::Float64, f::Float64) =
     winding_layer(pcb :: PCB_Specification,
                  isouter :: Bool,
                  core :: CoreGeometry,
-                 number_of_turns :: Int)
+                 turns :: Int)
 
 Create a `WindingLayer` for a specific core and PCB.
 """
 function winding_layer(pcb :: PCB_Specification,
                       isouter :: Bool,
                       core :: CoreGeometry,
-                      number_of_turns :: Int)
+                      turns :: Int)
   trace_width = (core.winding_aperture-2*pcb.trace_edge_gap-
-    (number_of_turns-1)*pcb.trace_trace_gap)/number_of_turns
+    (turns-1)*pcb.trace_trace_gap)/turns
   trace_length = 0.0
-  for i in 0:number_of_turns-1
+  for i in 0:turns-1
     r = core.half_center_width+pcb.trace_edge_gap+
         0.5*trace_width+i*(trace_width+pcb.trace_trace_gap)
     trace_length += 2π*r
@@ -99,7 +99,7 @@ function winding_layer(pcb :: PCB_Specification,
   trace_length += 2*core.center_length
   trace_thickness =
     isouter ? pcb.outer_copper_thickness : pcb.inner_copper_thickness
-  WindingLayer(trace_width, trace_length, trace_thickness, number_of_turns)
+  WindingLayer(trace_width, trace_length, trace_thickness, turns)
 end
 
 """
@@ -125,7 +125,8 @@ Number of turns, Array for `Transformer`.
 """
 turns
 
-turns(wl::WindingLayer) = wl.number_of_turns
+turns(wl::WindingLayer) = wl.turns
+#=
 function turns(w::Winding)
   if w.isseries
     t = 0
@@ -134,8 +135,9 @@ function turns(w::Winding)
     end
     return t
   end
-  return w.windinglayers[1].number_of_turns
+  return w.windinglayers[1].turns
 end
+=#
 turns(t::Transformer) = turns.(t.windings)
 
 """

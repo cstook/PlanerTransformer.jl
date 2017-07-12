@@ -160,13 +160,13 @@ end
 - `width`           -- width of trace (m)
 - `length`          -- length of trace (m)
 - `thickness`       -- thickness of trace (m)
-- `number_of_turns` -- number of turns
+- `turns` -- number of turns
 """
 struct WindingLayer
   width :: Float64
   length :: Float64
   thickness :: Float64
-  number_of_turns :: Int
+  turns :: Int
 end
 
 
@@ -187,10 +187,10 @@ struct Winding
     if length(windinglayers)==0
       throw(ArgumentError("must have at least one winding"))
     end
-    turns_1 = windinglayers[1].number_of_turns
+    turns_1 = windinglayers[1].turns
     turns = turns_1
     for i in 2:length(windinglayers)
-      turns_i = windinglayers[i].number_of_turns
+      turns_i = windinglayers[i].turns
       if isseries
         turns += turns_i
       elseif turns_i != turns_1
