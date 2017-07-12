@@ -169,8 +169,8 @@ core_geometry_dict["er12.5_plt"]
 
 
 
-
-
+a = 2.0
+a *= 1e-3
 
 
 

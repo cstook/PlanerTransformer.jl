@@ -10,8 +10,8 @@ pcb = PCB_Specification(trace_edge_gap,
                         inner_copper_thickness,
                         number_of_layers)
 core_geometry_dict
-my_geometry_list = ["er12.5_plt","er18_plt","er20_plt","er25/5.5_plt","er30_plt","er32_plt"]
-#my_geometry_list = ["e14_plt","e18_plt","e22_plt","e32_plt","e58_plt","e64_plt"]
+#my_geometry_list = ["er12.5_plt","er18_plt","er20_plt","er25/5.5_plt","er30_plt","er32_plt"]
+my_geometry_list = ["e14_plt","e18_plt","e22_plt","e32_plt","e58_plt","e64_plt"]
 my_ferrite_list = ["3f4"]#["3f4","3f45","3f5"];
 my_ferrites = getindex.(ferrite_dict,my_ferrite_list)
 my_cores = [getindex.(core_geometry_dict,x) for x in my_geometry_list]
