@@ -41,6 +41,19 @@ spldata_4f1 = SplInput((
   10e6,(3.2,43),(13,1500)
   ))
 
+spldata_r = SplInput((
+  25e3,(110,10),(300,180),
+  100e3,(51,10),(300,1100),
+  200e3,(35,10),(240,2000),
+  500e3,(30,45),(140,2000)
+  ))
+
+spldata_l = SplInput((
+  500e3,(20,10),(110,1000),
+  1e6,(15,10),(80,1000),
+  2e6,(4.2,10),(36,1000),
+  3e6,(2.5,10),(22,1000)
+  ))
 
 const ferrite_dict = Dict(
   "3f3" => FerriteProperties("3f3",0.2e6,0.5e6,25,100,
@@ -66,5 +79,13 @@ const ferrite_dict = Dict(
   "4f1" => FerriteProperties("4f1",4e6,10e6,25,100,
                              BHloop(160,.275,.200),
                              BHloop(140,.250,.150),
-                             SpecificPowerLossData(spldata_4f1))
-  )
+                             SpecificPowerLossData(spldata_4f1)),
+  "r" => FerriteProperties("r",0.5e6,1.8e6,25,100,
+                            BHloop(NaN,NaN,NaN),
+                            BHloop(NaN,NaN,NaN),
+                            SpecificPowerLossData(spldata_r)),
+  "l" => FerriteProperties("l",0.5e6,3e6,25,100,
+                            BHloop(NaN,NaN,NaN),
+                            BHloop(NaN,NaN,NaN),
+                            SpecificPowerLossData(spldata_l))
+)

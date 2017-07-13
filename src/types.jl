@@ -9,18 +9,20 @@ export Magnetics, Transformer
     CoreGeometry
 
 **Fields**
-- `name`                -- string identifying the core
-- `winding_aperture`    -- m
-- `half_center_width`   -- m
-- `center_length`       -- m
-- `effective_volume`    -- m^3
-- `effective_area`      -- m^2
-- `effective_length`    -- m
-- `mass`                -- Kg
+- `name`                      -- string identifying the core
+  `winding_aperture_height`  -- m
+- `winding_aperture`          -- m
+- `half_center_width`         -- m
+- `center_length`             -- m
+- `effective_volume`          -- m^3
+- `effective_area`            -- m^2
+- `effective_length`          -- m
+- `mass`                      -- Kg
 """
 struct CoreGeometry
   # all values are in MKS units
   name :: String
+  winding_aperture_height :: Float64
   winding_aperture :: Float64
   half_center_width :: Float64  # center_radius for ER
   center_length :: Float64

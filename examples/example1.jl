@@ -66,22 +66,7 @@ println(turns(windings(transformer[i])[1]))
 println(turns(windings(transformer[i])[2]))
 println(tp[i])
 
-# looking at stuff in Atom
-tpd_array[i]
-tp[:,1,:]
-
-
-
-
-
-
-
-tp_nan[:,1,:]
-
-
-
-
-
-
-
-#
+# looking at stuff in workspace window
+best = tpd_array[i]
+tp_cores_vs_windings = tp[:,1,:]
+tp_cores_vs_windings_nan = tp_nan[:,1,:]
