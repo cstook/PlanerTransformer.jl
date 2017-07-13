@@ -33,7 +33,7 @@ const core_geometry_dict = Dict(
   "er12.5_plt"=>CoreGeometry(Magnetics_ER_Input("er12.5_plt",15.9, 19.8, 315, 1, 11.2, 5.0)),
   "er18_plt"=>CoreGeometry(Magnetics_ER_Input("er18_plt",20.3, 40.1, 813, 3.9, 15.6, 6.2)),
   "er20_plt"=>CoreGeometry(Magnetics_ER_Input("er20_plt",22.5, 57.3, 1460, 8, 18, 8.8)),
-  "er25/5.5_plt"=>CoreGeometry(Magnetics_ER_Input("er25_plt",26.4, 89.7, 2370, 13.1, 22.0, 11.0)), #mate with ER 25/5.5/18
+  "er25/5.5_plt"=>CoreGeometry(Magnetics_ER_Input("er25/5.5_plt",26.4, 89.7, 2370, 13.1, 22.0, 11.0)), #mate with ER 25/5.5/18
   "er30_plt"=>CoreGeometry(Magnetics_ER_Input("er30_plt",36.2, 108, 3910, 20.8, 26.0, 11.0)),
   "er32_plt"=>CoreGeometry(Magnetics_ER_Input("er32_plt",35.1, 130, 4560, 22, 27.2, 12.4)),
   )

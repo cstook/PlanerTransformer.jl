@@ -54,8 +54,8 @@ winding_resistance_array = winding_resistance(transformer)
 @test winding_resistance_array[1] ≈ 0.0015265864267914595
 @test winding_resistance_array[2] ≈ 0.0027866178802512884
 power = TransformerPowerDissipation(transformer, [2.0,5.0], 1e6)
-@test power.flux_density ≈ 0.022988505747126436
-@test power.total_power ≈0.15865040116229484
+@test power.flux_density ≈ 0.011494252873563218
+@test power.total_power ≈ 0.14184113733295778
 @test flux_density(magnetics,150e3,1e6) ≈ 0.031109516217764782
 @test volt_seconds_per_turn(magnetics, 0.03) ≈ 4.3499999999999996e-7
 @test volts_per_turn(magnetics, 150e3, 1e6) ≈ 0.9021759703151787
