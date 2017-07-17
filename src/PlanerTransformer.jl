@@ -1,6 +1,7 @@
 __precompile__()
 
 module PlanerTransformer
+include("Stackup.jl")
 include("types.jl")
 include("TransformerPowerDissipation.jl")
 include("functionalize_fieldnames.jl")

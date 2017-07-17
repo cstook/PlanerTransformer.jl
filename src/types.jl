@@ -111,48 +111,21 @@ struct FerriteProperties
 end
 
 """
-    PCB_Specification(trace_edge_gap,
-                      trace_trace_gap,
-                      outer_copper_thickness,
-                      inner_copper_thickness = 0.0,
-                      number_of_layers = 2,
-                      ρ_20=1.68e-8,
-                      temperature_coefficient=0.003862)
+    PCB_Specification(trace_edge_gap  :: Float64,
+                      trace_trace_gap :: Float64,
+                      stackup         :: Stackup)
 
 Store PCB data.
 
 **Fields**
 - `trace_edge_gap`          -- minimum distance from trace to PCB edge (m)
 - `trace_trace_gap`         -- minimum distance between traces (m)
-- `outer_copper_thickness`  -- thickness of top and bottom copper layers (m)
-- `inner_copper_thickness`  -- thickness of inner copper layers (m)
-- `number_of_layers`        -- number of copper layers
-- `ρ_20`                    -- conductivity, default to 1.68e-8 Ωm for Cu @ 20C
-- `temperature_coefficient` -- default to 0.003862 1/K for Cu
+- `stackup`                 -- defines material and thickness of the layers
 """
 struct PCB_Specification
   trace_edge_gap :: Float64
   trace_trace_gap :: Float64
-  outer_copper_thickness :: Float64
-  inner_copper_thickness :: Float64
-  number_of_layers :: Int
-  ρ_20 :: Float64 # Ωm @ 20C
-  temperature_coefficient :: Float64 # 1/K
-  function PCB_Specification(trace_edge_gap,
-                     trace_trace_gap,
-                     outer_copper_thickness,
-                     inner_copper_thickness = 0.0,
-                     number_of_layers = 2,
-                     ρ_20=1.68e-8, # Ωm for Cu @ 20C
-                     temperature_coefficient=0.003862) # 1/K for Cu
-    new(trace_edge_gap,
-        trace_trace_gap,
-        outer_copper_thickness,
-        inner_copper_thickness,
-        number_of_layers,
-        ρ_20,
-        temperature_coefficient)
-  end
+  stackup :: Stackup
 end
 
 """

@@ -110,11 +110,13 @@ by 0.48e-3 to give thickness in meters.
 """
 copper_weight_to_meters(oz) = 0.48e-3*oz
 
+const μ0 =1.2566370614e-6
+δ(f,ρ)=√(ρ/(π*f*μ0)) # skin depth
 function conductivity(ρ_20, temperature_coefficient, temperature)
   # todo: add skin effect
   ρ_20*(1 + temperature_coefficient*(temperature-20.0))
 end
-
+leakage_inductance(volume,turns,width) = volume*μ0*(turns/width)^2
 
 """
     turns(windinglayer::WindingLayer)
