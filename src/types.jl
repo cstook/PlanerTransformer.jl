@@ -1,9 +1,7 @@
 export CoreGeometry
 export BHloop, SpecificPowerLossData
 export FerriteProperties
-export PCB_Specification, WindingLayer
-export Winding
-export Magnetics, Transformer
+export PCB_Specification
 
 """
     CoreGeometry
@@ -110,6 +108,8 @@ struct FerriteProperties
   spl_hot :: SpecificPowerLossData
 end
 
+include("Stackup.jl")
+
 """
     PCB_Specification(trace_edge_gap  :: Float64,
                       trace_trace_gap :: Float64,
@@ -128,6 +128,10 @@ struct PCB_Specification
   stackup :: Stackup
 end
 
+include("Winding.jl")
+include("Transformer.jl")
+
+#=  BEGIN OLD CODE  ****************************
 """
     WindingLayer
 
@@ -201,6 +205,7 @@ struct Transformer
     new(m,w)
   end
 end
+=# # END OLD CODE  ****************************
 
 struct ChanInductor
   hc :: Float64

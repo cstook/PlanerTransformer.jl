@@ -7,13 +7,15 @@ function functionalize_fieldnames(x)
 end
 
 methods_to_functionalize = [PCB_Specification,
-                            WindingLayer,
-                            Winding,
-                            Magnetics,
+                            WindingGeometry,
+                            Windings,
                             Transformer,
-                            TransformerPowerDissipation,
+                            TransformerAnalysis,
                             CoreGeometry,
                             FerriteProperties,
+                            Conductor,
+                            Dielectric,
+                            Stackup
                             ]
 
 import Base.length

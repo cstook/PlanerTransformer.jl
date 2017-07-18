@@ -3,6 +3,11 @@ export copper, fr408
 
 
 abstract type LayerMaterial end
+name(::LayerMaterial) = ""
+ρ_20(::LayerMaterial) = NaN
+tc(::LayerMaterial) = NaN
+ϵ(::LayerMaterial) = NaN
+
 struct Conductor <: LayerMaterial
   name  :: String
   ρ_20  :: Float64
@@ -17,6 +22,7 @@ struct Dielectric <: LayerMaterial
   ϵ    :: Float64
 end
 const fr408 = Dielectric("fr408",3.67*ϵ0)
+
 
 
 """
@@ -43,8 +49,8 @@ struct Stackup
     if mod(length(s),2) == 0
       throw(ArgumentEror("stackup must have odd number of layers"))
     end
-    for i in eachindex(material)
-      if mod(i,2) = 0
+    for i in eachindex(s)
+      if mod(i,2) == 0
         if typeof(s[i]) != Dielectric
           throw(ArgumentError("even layers must be Dielectric"))
         end

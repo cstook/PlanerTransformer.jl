@@ -1,3 +1,4 @@
+export WindingGeometry, Windings, windings, winding_geometry
 
 """
     WindingGeometry
@@ -26,7 +27,7 @@ function winding_geometry(pcb :: PCB_Specification,
     trace_length += 2π*r
   end
   trace_length += 2*core.center_length
-  WindingLayer(trace_width, trace_length, turns)
+  WindingGeometry(trace_width, trace_length, turns)
 end
 
 """
@@ -38,6 +39,7 @@ end
 - `primarywindinggeometry`  -- `WindingGeometry` for all layers of primary
 - `secondarywindinggeometry`-- `WindingGeometry` for all layers of secondary
 - `isprimary`               -- tuple of `Bool` for each conductor layer
+- `sides`                   --
 - `isprimaryseries`         -- true if primary is connected in series
 - `issecondaryseries`       -- true if secondary is connected in series
 """
@@ -47,6 +49,7 @@ struct Windings
   primarywindinggeometry :: WindingGeometry
   secondarywindinggeometry :: WindingGeometry
   isprimary :: Tuple
+  sides :: Tuple
   isprimaryseries :: Bool
   issecondaryseries :: Bool
 end
@@ -63,6 +66,21 @@ function windings(pcb::PCB_Specification, core::CoreGeometry,
            winding_geometry(pcb,core,primaryturnsperlayer),
            winding_geometry(pcb,core,secondaryturnsperlayer),
            isprimary,
+           ntuple(i->sides(isprimary,i),length(isprimary)),
            isprimaryeries, issecondaryseries
           )
 end
+
+function sides(isprimary,i)::Float64
+  i==1 && return 1.0
+  i==length(isprimary) && return 1.0
+  s = 0.0
+  isprimary[i] == isprimary[i-1] && (s+=1.0)
+  isprimary[i] == isprimary[i+1] && (s+=1.0)
+  return s
+end
+
+effective_volume(w::Windings) = effective_volume(core(w))
+effective_area(w::Windings) = effective_area(core(w))
+effective_length(w::Windings) = effective_length(core(w))
+winding_aperature_height(w::Windings) = winding_aperature_height(core(w))

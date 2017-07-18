@@ -20,7 +20,6 @@ end
 """
     specific_power_loss(spl::SpecificPowerLossData, flux_density, frequency)
     specific_power_loss(fp::FerriteProperties, flux_density, frequency)
-    specific_power_loss(m::Magnetics, flux_density, frequency)
     specific_power_loss(t::Transformer, flux_density, frequency)
 
 Returns specific power loss.
@@ -41,16 +40,13 @@ function specific_power_loss(spl::SpecificPowerLossData, flux_density, f)
 end
 specific_power_loss(fp::FerriteProperties, flux_density, f) =
   specific_power_loss(fp.spl_hot,flux_density,f)
-specific_power_loss(m::Magnetics, flux_density::Float64, f::Float64)=
-  specific_power_loss(m.ferriteproperties,flux_density,f)
 specific_power_loss(t::Transformer, flux_density::Float64, f::Float64)=
-  specific_power_loss(t.magnetics,flux_density,f)
+  specific_power_loss(ferrite(t),flux_density,f)
 
 
 """
     flux_density(spl::SpecificPowerLossData, coreloss, frequency)
     flux_density(fp::FerriteProperties, coreloss, frequency)
-    flux_density(m::Magnetics, coreloss, frequency)
     flux_density(t::Transformer, coreloss, frequency)
 
 Returns magnetic field strength in Tesla.
@@ -71,11 +67,11 @@ function flux_density(spl::SpecificPowerLossData, coreloss::Float64, f::Float64)
 end
 flux_density(fp::FerriteProperties, coreloss::Float64, f::Float64) =
   flux_density(fp.spl_hot,coreloss,f)
-flux_density(m::Magnetics, coreloss::Float64, f::Float64) =
-  flux_density(m.ferriteproperties,coreloss,f)
 flux_density(t::Transformer, coreloss::Float64, f::Float64) =
-  flux_density(t.magnetics,coreloss,f)
+  flux_density(ferriteproperties(t),coreloss,f)
 
+
+#=
 """
     winding_layer(pcb :: PCB_Specification,
                  isouter :: Bool,
@@ -101,36 +97,36 @@ function winding_layer(pcb :: PCB_Specification,
     isouter ? pcb.outer_copper_thickness : pcb.inner_copper_thickness
   WindingLayer(trace_width, trace_length, trace_thickness, turns)
 end
+=#
 
 """
     copper_weight_to_meters(oz)
 
 PCB copper thickness is typicaly given in ounces.  This function multiplies
-by 0.48e-3 to give thickness in meters.
+by 35e-6 to give thickness in meters.
 """
-copper_weight_to_meters(oz) = 0.48e-3*oz
-
-const μ0 =1.2566370614e-6
-δ(f,ρ)=√(ρ/(π*f*μ0)) # skin depth
-function conductivity(ρ_20, temperature_coefficient, temperature)
-  # todo: add skin effect
-  ρ_20*(1 + temperature_coefficient*(temperature-20.0))
-end
-leakage_inductance(volume,turns,width) = volume*μ0*(turns/width)^2
+copper_weight_to_meters(oz) = 35e-6*oz
 
 """
-    turns(windinglayer::WindingLayer)
-    turns(winding::Winding)
+    turns(windinggeometry::WindingGeometry)
+    turns(windings::Windings)
     turns(transformer::Transformer)
 
 Number of turns, Array for `Transformer`.
 """
-turns(t::Transformer) = turns.(t.windings)
+function turns(w::Windings)
+  primary_turns = turns(primarywindinggeometry(w))
+  primary_turns *= isprimaryseries(w) ? count(isprimary(w)) : 1.0
+  secondary_turns = turns(secondarywindinggeometry(w))
+  secondary_turns *= issecondaryseries(w) ? count(~isprimary(w)) : 1.0
+  (primary_turns, secondary_turns)
+end
+turns(t::Transformer) = turns(windings(t))
 
 """
     volt_seconds_per_turn(effective_area, flux_density_pp)
     volt_seconds_per_turn(cg::CoreGeometry, flux_density_pp)
-    volt_seconds_per_turn(m::Magnetics, flux_density_pp)
+    volt_seconds_per_turn(w::Windings, flux_density_pp)
     volt_seconds_per_turn(t::Transformer, flux_density_pp)
 
 Volt seconds per turn at `flux_density_pp`.  The first form is just an alias for multiply.
@@ -138,82 +134,66 @@ Volt seconds per turn at `flux_density_pp`.  The first form is just an alias for
 volt_seconds_per_turn(effective_area, flux_density_pp) =
   effective_area * flux_density_pp
 volt_seconds_per_turn(cg::CoreGeometry, flux_density_pp) =
-  volt_seconds_per_turn(cg.effective_area, flux_density_pp)
-volt_seconds_per_turn(m::Magnetics, flux_density_pp) =
-  volt_seconds_per_turn(m.core, flux_density_pp)
+  volt_seconds_per_turn(effective_area(cg), flux_density_pp)
+volt_seconds_per_turn(w::Windings, flux_density_pp) =
+  colt_seconds_per_turn(core(w), flux_density_pp)
 volt_seconds_per_turn(t::Transformer, flux_density_pp) =
-  volt_seconds_per_turn(t.magnetics, flux_density_pp)
+  volt_seconds_per_turn(windings(t), flux_density_pp)
 
 """
     volt_seconds(t::Transformer, flux_density_pp)
 
 Volt seconds at `flux_density_pp`.
 """
+volt_seconds(w::Windings, flux_density_pp) =
+  volt_seconds_per_turn(core(w), flux_density_pp).*turns(w)
 volt_seconds(t::Transformer, flux_density_pp) =
-  volt_seconds_per_turn(t, flux_density_pp).*turns(t)
+  volt_seconds_per_turn(windings(t), flux_density_pp)
 
-
-# BEGIN need to rethink this
-"""
-    volts_per_turn(cg::CoreGeometry,
-                   fp::FerriteProperties, loss_limit, frequency)
-
-Returns the maximum volts per turn.
-"""
-function volts_per_turn(fp::FerriteProperties,
-                        effective_area::Float64,
-                        loss_limit::Float64,
-                        frequency::Float64)
-  flux_density_peak = flux_density(fp,loss_limit,frequency)
-  flux_density_pp = 2*flux_density_peak
-  return volt_seconds_per_turn(effective_area,flux_density_pp) * frequency
+const μ0 =1.2566370614e-6
+skin_depth(ρ,f)=√(ρ/(π*f*μ0)) # skin depth
+function conductivity(ρ_20, temperature_coefficient, temperature)
+  ρ_20*(1 + temperature_coefficient*(temperature-20.0))
 end
-function volts_per_turn(fp::FerriteProperties,
-                        cg::CoreGeometry,
-                        loss_limit::Float64,
-                        frequency::Float64)
-  volts_per_turn(fp,cg.effective_area,loss_limit,frequency)
-end
-volts_per_turn(m::Magnetics, loss_limit::Float64, frequency::Float64) =
-  volts_per_turn(m.ferriteproperties, m.core, loss_limit, frequency)
-volts_per_turn(t::Transformer, loss_limit::Float64, frequency::Float64) =
-  volts_per_turn(t.magnetics, loss_limit, frequency)
 
-function volts(w::Winding,m::Magnetics,loss_limit::Float64, frequency::Float64)
-  volts_per_turn(m,loss_limit,frequency)*w.turns
-end
-function volts(t::Transformer,loss_limit::Float64, frequency::Float64)
-  vpt = volts_per_turn(t,loss_limit,frequency)
-  [vpt*t.windings[i].turns for i in eachindex(t.windings)]
-end
-# END need to rethink this
-
-"""
-    winding_resistance(wl::WindingLayer, ρ)
-    winding_resistance(wl::WindingLayer, pcb::PCB_Specification, temperature=100.0)
-    winding_resistance(w::Winding, temperature=100.0)
-
-Returns the resistance of a `Winding` or `WindingLayer`.
-"""
-winding_resistance(wl::WindingLayer, ρ) = ρ*wl.length/(wl.width*wl.thickness)
-function winding_resistance(wl::WindingLayer, pcb::PCB_Specification, temperature=100.0)
-  ρ = conductivity(pcb.ρ_20, pcb.temperature_coefficient, temperature)
-  winding_resistance(wl,ρ)
-end
-function winding_resistance(w::Winding, temperature=100.0)
-  x = 0.0
-  for i in eachindex(w.windinglayers)
-    r = winding_resistance(w.windinglayers[i],w.pcb,temperature)
-    x += w.isseries ?  r : 1/r
+layer_resistance(wg::WindingGeometry, thickness, ρ) =
+  ρ*length(wg)/(width(wg)*thickness)
+function layer_resistance(w::Windings, i, frequency=0.0, temperature=100.0)
+  winding_geometry = isprimary(w)[i] ? primarywindinggeometry(w) : secondarywindinggeometry(w)
+  ρ = conductivity(ρ_20(material(stackup(pcb(w)))[i*2-1]), tc(material(stackup(pcb(w)))[i*2-1]), temperature)
+  effective_thickness = thickness(stackup(pcb(w)))[i*2-1]
+  if frequency>0.0
+    δ = skin_depth(p, frequency)
+    effective_thickness *= sides(w)[i]*δ
   end
-  return w.isseries ?  x : 1/x
+  layer_resistance(winding_geometry, effective_thickness, ρ)
 end
-winding_resistance(t::Transformer) =
-  [winding_resistance(t.windings[i]) for i in eachindex(t.windings)]
+function layer_resistance_tuple(w::Windings, frequency=0.0, temperature=100.0)
+  ntuple(i->layer_resistance(w, i, frequency, temperature), eachindex(isprimary(w)))
+end
+"""
+    winding_resistance(w::Windings, frequency=0.0, temperature=100.0)
 
-center_frequency(fp::FerriteProperties) = middle(fp.fmin,fp.fmax)
-center_frequency(m::Magnetics) = center_frequency(m.ferriteproperties)
-center_frequency(t::Transformer) = center_frequency(t.magnetics)
+Returns tuple `(primary_resistance, secondary_resistance)`
+"""
+function winding_resistance(w::Windings, frequency=0.0, temperature=100.0)
+  primary = 0.0
+  secondary = 0.0
+  for i in eachindex(isprimary(w))
+    x = layer_resistance(w,i,frequency,temperature)
+    if isprimary(w)[i]
+      primary += isprimaryseries(w) ? x : 1/x
+    else
+      secondary = issecondaryseries(w) ? x : 1/x
+    end
+  end
+  (isprimaryseries(w) ? primary : 1/primary, issecondaryseries(w) ? secondary : 1/secondary)
+end
+winding_resistance(t::Transformer, frequency=0.0, temperature=100.0) =
+  winding_resistance(windings(t),frequency,temperature)
+
+center_frequency(fp::FerriteProperties) = middle(fmin(fp),fmax(fp))
+center_frequency(t::Transformer) = center_frequency(ferriteproperties(t))
 
 """
     equivalent_parallel_resistance(tansformer::Transformer,
@@ -233,30 +213,17 @@ function equivalent_parallel_resistance(fp::FerriteProperties,
                                         turns=1,
                                         ishot::Bool=true)
   flux_density = volts/(2.0*frequency*turns*effective_area)
-  spldata = ishot?fp.spl_hot:fp.spl_room
+  spldata = ishot?spl_hot(fp):spl_room(fp)
   spl = specific_power_loss(spldata,flux_density,frequency)
   loss = spl*effective_volume
   volts^2/loss
-end
-function equivalent_parallel_resistance(m::Magnetics,
-                                        volts,
-                                        frequency=center_frequency(m),
-                                        turns=1,
-                                        ishot::Bool=true)
-  equivalent_parallel_resistance(m.ferriteproperties,
-                                 effective_area(m.core),
-                                 effective_volume(m.core),
-                                 volts,
-                                 frequency,
-                                 turns,
-                                 ishot)
 end
 function equivalent_parallel_resistance(t::Transformer,
                                         volts,
                                         frequency=center_frequency(t),
                                         turns=1,
                                         ishot::Bool=true)
-  equivalent_parallel_resistance(t.magnetics,
+  equivalent_parallel_resistance(ferriteproperties(t),
                                  volts,
                                  frequency,
                                  turns,
@@ -265,7 +232,6 @@ end
 
 """
     chan_inductor(ferriteproperties, effective_area, effective_length,ishot=true)
-    chan_inductor(magnetics, ishot=true)
     chan_inductor(transformer, ishot=true)
 
 Parameters for LTspice [Chan inductor](http://ltwiki.org/?title=The_Chan_model)
@@ -274,10 +240,13 @@ to be used for magnetizing inductance.
 chan_inductor
 function chan_inductor(fp::FerriteProperties,
                        effective_area,effective_length,ishot::Bool=true)
-  bh = ishot?fp.bh_hot:fp.bh_room
-  ChanInductor(bh.hc, bh.bs, bh.br, effective_area, effective_length,0.0, 1.0)
+  bh = ishot ? bh_hot(fp) : bh_room(fp)
+  ChanInductor(hc(bh), bs(bh), br(bh), effective_area, effective_length,0.0, 1.0)
 end
-chan_inductor(m::Magnetics, ishot::Bool=true) =
-  chan_inductor(m.ferriteproperties, effective_area(m.core), effective_length(m.core),ishot)
 chan_inductor(t::Transformer, ishot::Bool=true) =
-  chan_inductor(t.magnetics, ishot)
+  chan_inductor(ferriteproperties(t),
+                effective_area(t),
+                effective_length(t),
+                ishot)
+
+leakage_inductance(volume,turns,width) = volume*μ0*(turns/width)^2
