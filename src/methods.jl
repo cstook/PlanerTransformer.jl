@@ -116,9 +116,9 @@ Number of turns, Array for `Transformer`.
 """
 function turns(w::Windings)
   primary_turns = turns(primarywindinggeometry(w))
-  primary_turns *= isprimaryseries(w) ? count(isprimary(w)) : 1.0
+  primary_turns *= isprimaryseries(w) ? count(isprimary(w)) : 1
   secondary_turns = turns(secondarywindinggeometry(w))
-  secondary_turns *= issecondaryseries(w) ? count(~isprimary(w)) : 1.0
+  secondary_turns *= issecondaryseries(w) ? length(isprimary(w)) - count(isprimary(w)) : 1
   (primary_turns, secondary_turns)
 end
 turns(t::Transformer) = turns(windings(t))
