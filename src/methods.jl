@@ -163,8 +163,8 @@ function layer_resistance(w::Windings, i, frequency=0.0, temperature=100.0)
   ρ = conductivity(ρ_20(material(stackup(pcb(w)))[i*2-1]), tc(material(stackup(pcb(w)))[i*2-1]), temperature)
   effective_thickness = thickness(stackup(pcb(w)))[i*2-1]
   if frequency>0.0
-    δ = skin_depth(p, frequency)
-    effective_thickness *= sides(w)[i]*δ
+    δ = skin_depth(ρ, frequency)
+    effective_thickness = minimum((sides(w)[i]*δ, effective_thickness))
   end
   layer_resistance(winding_geometry, effective_thickness, ρ)
 end
@@ -193,7 +193,7 @@ winding_resistance(t::Transformer, frequency=0.0, temperature=100.0) =
   winding_resistance(windings(t),frequency,temperature)
 
 center_frequency(fp::FerriteProperties) = middle(fmin(fp),fmax(fp))
-center_frequency(t::Transformer) = center_frequency(ferriteproperties(t))
+center_frequency(t::Transformer) = center_frequency(ferrite(t))
 
 """
     equivalent_parallel_resistance(tansformer::Transformer,

@@ -8,65 +8,38 @@
 
 using PlanerTransformer
 
-# Define PCB
+# define pcb
 trace_edge_gap = 0.16e-3
 trace_trace_gap = 0.13e-3
-outer_copper_thickness = copper_weight_to_meters(1.0)
-inner_copper_thickness = copper_weight_to_meters(1.0)
+outer = copper_weight_to_meters(1.0)
+inner = copper_weight_to_meters(1.0)
 number_of_layers = 4
+dielectric = (1.6e-3-2*outer-2*inner)/4
+
+stackup = Stackup([copper,fr408,copper,fr408,copper,fr408,copper],
+                  [outer,dielectric,inner,dielectric,inner,dielectric,outer])
 pcb = PCB_Specification(trace_edge_gap,
                         trace_trace_gap,
-                        outer_copper_thickness,
-                        inner_copper_thickness,
-                        number_of_layers)
+                        stackup)
 
-# Create an array of transformers
-# my_geometry_list = ["er12.5_plt","er18_plt","er20_plt","er25/5.5_plt","er30_plt","er32_plt"]
-my_geometry_list = ["e14_plt","e18_plt","e22_plt","e32_plt","e58_plt","e64_plt"]
-my_ferrite_list = ["3f4","3f45","3f5"];
+# core geometries to analyze
+my_geometry_list = ["e14_plt","e18_plt","e22_plt","e32_plt","e58_plt"]
+my_cores = getindex.(core_geometry_dict,my_geometry_list)
+
+# ferrites to analyze
+my_ferrite_list = ["3f4","3f45","3f5","4f1"]
 my_ferrites = getindex.(ferrite_dict,my_ferrite_list)
-my_cores = [getindex.(core_geometry_dict,x) for x in my_geometry_list]
-my_magnetics = [Magnetics(y,x) for x in my_cores, y in my_ferrites]
-turns_per_layer = 1:6
-outer_winding_layer = [winding_layer(pcb,true,x,y) for x in my_cores, y in turns_per_layer]
-inner_winding_layer = [winding_layer(pcb,false,x,y) for x in my_cores, y in turns_per_layer]
-primary = [Winding(pcb,[x,x],true) for x in outer_winding_layer]
-secondary = [Winding(pcb,[y,y],true) for y in inner_winding_layer]
-transformer = Array{Transformer}(length(my_cores),length(my_ferrites),length(turns_per_layer))
-for x in eachindex(my_cores)
-  for y in eachindex(my_ferrites)
-    for z in eachindex(turns_per_layer)
-      transformer[x,y,z] = Transformer(my_magnetics[x,y],[primary[x,z],secondary[x,z]])
-    end
-  end
-end
 
-# Conditions to compute power dissipation
-frequency = 3e6  # Hz
-spl_max = 450e3
-primary_voltage_pp = 20.0
-output_current_pp = 5.0 # W/m^3
+# 1 to 10 turns per layer
+turns_per_layer = 1:10
+my_windings = [windings(pcb,x,y,y,(true,false,false,true),false,false) for x in my_cores, y in turns_per_layer]
 
-# Compute power dissipstion for each transformer
-tpd_array = [TransformerPowerDissipation(transformer[x,y,z],[primary_voltage_pp, output_current_pp], frequency)
-  for x in eachindex(my_cores),
-      y in eachindex(my_ferrites),
-      z in eachindex(turns_per_layer)]
+# create transformers for all conbinations
+my_transformers = [Transformer(f,w) for f in my_ferrites, w in my_windings]
 
-# just the power dissipation
-tp = total_power.(tpd_array)
-# power dissipation replaced by NaN if specific power loss exceeds maximum.
-tp_nan = (x->core_specific_power(x)<spl_max?total_power(x):NaN).(tpd_array)
-(v,i) = findmin(tp_nan) # find the most efficient design
+v_in = 20.0
+i_out = -5.0 # negative because power flows out of secondary
+frequency = 10e6
+my_analysis = TransformerAnalysis.(my_transformers, PushPull(), v_in, i_out, frequency)
 
-# print some info for the most efficient design
-println(name(ferriteproperties(magnetics(transformer[i]))))
-println(name(core(magnetics(transformer[i]))))
-println(turns(windings(transformer[i])[1]))
-println(turns(windings(transformer[i])[2]))
-println(tp[i])
-
-# looking at stuff in workspace window
-best = tpd_array[i]
-tp_cores_vs_windings = tp[:,1,:]
-tp_cores_vs_windings_nan = tp_nan[:,1,:]
+total_power.(my_analysis[4,:,1:6])

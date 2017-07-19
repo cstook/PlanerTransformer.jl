@@ -3,6 +3,7 @@ export BHloop, SpecificPowerLossData
 export FerriteProperties
 export PCB_Specification
 
+include("ConverterTypes.jl")
 """
     CoreGeometry
 

@@ -1,13 +1,11 @@
 export TransformerAnalysis
 
 """
-    TransformerAnalysis(t::Transformer, v_in, i_out, frequency)
+    TransformerAnalysis(t::Transformer, ct::Converter, v_in, i_out, frequency)
 
-Computes power dissipation of transformer.
+Returns a `TransformerAnalysis` object.
 
-The first element of the input array is the peak to peak voltage applied to the
-first winding.  The following elements are the load currents in the output
-windings.  Returns a `TransformerAnalysis` object.
+v_in and i_out are peak to peak.
 
 **Fields**
 - `transformer`             -- from input
@@ -17,39 +15,37 @@ windings.  Returns a `TransformerAnalysis` object.
 - `core_specific_power`     -- power dissipated in core (W/m^3)
 - `core_total_power`        -- power dissipated in core (W)
 - `winding_power`           -- power dissipated in each winding (W)
-- `total_power`             -- `core_total_power +sum(winding_power)`
+- `total_power`             -- `core_total_power + sum(winding_power)`
 """
 struct TransformerAnalysis
   transformer :: Transformer
   frequency :: Float64
   flux_density ::Float64
-  winding_voltage :: Tuple # (primary, secondary)
+  voltage :: Tuple # (primary, secondary)
+  current :: Tuple # (primary, secondary)
+  ac_winding_resistance :: Tuple
+  dc_winding_resistance :: Tuple
   core_specific_power :: Float64
   core_total_power :: Float64
   winding_power :: Tuple # (primary, secondary)
   total_power :: Float64
-  function TransformerAnalysis(t::Transformer, v_in, i_out, frequency)
-    flux_density = v_in/(4.0*frequency*turns(t)[1]*effective_area(t))
-    core_specific_power = specific_power_loss(t,flux_density,frequency)
+  function TransformerAnalysis(t::Transformer, ct::Converter, v_in, i_out, frequency=center_frequency(t))
+    seconds = duty(ct)/frequency
+    flux_density_pp = v_in*seconds/(turns(t)[1]*effective_area(t))
+    flux_density = flux_density_pp / 2.0
+    core_specific_power = specific_power_loss(t, flux_density, frequency)
     core_total_power = effective_volume(t) * core_specific_power
-    turns_ratio = turns(t)[2]/turns(t)[1]
-    v = (v_in, v_in*turns_ratio)
-    resistance = winding_resistance(t)
-    p_secondary = i_out^2 * resistance[2]
-    p_primary = 0.0
-    i1 = 0.0
-    i1previous = 0.0
-    for i in 1:10
-      pbetter = p_secondary+p_primary
-      i1 = pbetter/v_in
-      if abs(i1-i1previous)<=eps()
-        break
-      end
-      i1previous = i1
-      p_primary = i1^2*resistance[1]
-    end
+    n = turns(t)[2]/turns(t)[1]
+    v1 = v_in
+    i2 = i_out
+    i1 = -i2 / n
+    r = winding_resistance(t, frequency)
+    v2 = v1*n + i2*(r[1]*n + core_total_power/(i2^2*duty(ct)) + r[2])
+    p_primary = duty(ct)*i1^2*r[1]
+    p_secondary = duty(ct)*i2^2*r[2]
     total_power = core_total_power + p_primary + p_secondary
-    new(t, frequency, flux_density, v, core_specific_power,
+    new(t, frequency, flux_density, (v1, v2), (i1, i2),r,
+        winding_resistance(t,0.0), core_specific_power,
         core_total_power, (p_primary, p_secondary), total_power)
   end
 end
