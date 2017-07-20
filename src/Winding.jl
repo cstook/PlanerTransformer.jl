@@ -27,6 +27,10 @@ function winding_geometry(pcb :: PCB_Specification,
     trace_length += 2π*r
   end
   trace_length += 2*core.center_length
+  if trace_width<=0.0
+    warn("$(turns) on $(name(core)) will result in negative trace width.  Setting to NaN.")
+    trace_width = NaN
+  end
   WindingGeometry(trace_width, trace_length, turns)
 end
 
@@ -84,3 +88,4 @@ effective_volume(w::Windings) = effective_volume(core(w))
 effective_area(w::Windings) = effective_area(core(w))
 effective_length(w::Windings) = effective_length(core(w))
 winding_aperature_height(w::Windings) = winding_aperature_height(core(w))
+winding_aperture(w::Windings) = winding_aperture(core(w))

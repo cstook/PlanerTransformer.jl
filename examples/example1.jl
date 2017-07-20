@@ -40,6 +40,7 @@ my_transformers = [Transformer(f,w) for f in my_ferrites, w in my_windings]
 v_in = 20.0
 i_out = -5.0 # negative because power flows out of secondary
 frequency = 10e6
-my_analysis = TransformerAnalysis.(my_transformers, PushPull(), v_in, i_out, frequency)
+my_analysis = transformer_power_analysis.(my_transformers, PushPull(), v_in, i_out, frequency)
 
-total_power.(my_analysis[4,:,1:6])
+(pmin,index) = findmin(total_power.(my_analysis))
+best_transformer = my_analysis[index]

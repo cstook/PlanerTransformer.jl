@@ -1,7 +1,7 @@
 export flux_density, specific_power_loss
 export turns, copper_weight_to_meters, winding_resistance
-export volt_seconds_per_turn, volts_per_turn, volts, volt_seconds
-export equivalent_parallel_resistance, winding_layer, chan_inductor
+export volt_seconds_per_turn
+export chan_inductor, leakage_inductance
 
 
 function interpolate_third_point(x1,y1,x2,y2, x3)
@@ -70,35 +70,6 @@ flux_density(fp::FerriteProperties, coreloss::Float64, f::Float64) =
 flux_density(t::Transformer, coreloss::Float64, f::Float64) =
   flux_density(ferriteproperties(t),coreloss,f)
 
-
-#=
-"""
-    winding_layer(pcb :: PCB_Specification,
-                 isouter :: Bool,
-                 core :: CoreGeometry,
-                 turns :: Int)
-
-Create a `WindingLayer` for a specific core and PCB.
-"""
-function winding_layer(pcb :: PCB_Specification,
-                      isouter :: Bool,
-                      core :: CoreGeometry,
-                      turns :: Int)
-  trace_width = (core.winding_aperture-2*pcb.trace_edge_gap-
-    (turns-1)*pcb.trace_trace_gap)/turns
-  trace_length = 0.0
-  for i in 0:turns-1
-    r = core.half_center_width+pcb.trace_edge_gap+
-        0.5*trace_width+i*(trace_width+pcb.trace_trace_gap)
-    trace_length += 2π*r
-  end
-  trace_length += 2*core.center_length
-  trace_thickness =
-    isouter ? pcb.outer_copper_thickness : pcb.inner_copper_thickness
-  WindingLayer(trace_width, trace_length, trace_thickness, turns)
-end
-=#
-
 """
     copper_weight_to_meters(oz)
 
@@ -150,7 +121,7 @@ volt_seconds(w::Windings, flux_density_pp) =
 volt_seconds(t::Transformer, flux_density_pp) =
   volt_seconds_per_turn(windings(t), flux_density_pp)
 
-const μ0 =1.2566370614e-6
+const μ0 =4π*1e-7
 skin_depth(ρ,f)=√(ρ/(π*f*μ0)) # skin depth
 function conductivity(ρ_20, temperature_coefficient, temperature)
   ρ_20*(1 + temperature_coefficient*(temperature-20.0))
@@ -196,41 +167,6 @@ center_frequency(fp::FerriteProperties) = middle(fmin(fp),fmax(fp))
 center_frequency(t::Transformer) = center_frequency(ferrite(t))
 
 """
-    equivalent_parallel_resistance(tansformer::Transformer,
-                                   volts,
-                                   frequency=center_frequency(transformer),
-                                   turns=1,
-                                   ishot::Bool=true)
-
-Parallel resistance for spice model for correct power dissipation.
-"""
-equivalent_parallel_resistance
-function equivalent_parallel_resistance(fp::FerriteProperties,
-                                        effective_area,
-                                        effective_volume,
-                                        volts,
-                                        frequency=center_frequency(fp),
-                                        turns=1,
-                                        ishot::Bool=true)
-  flux_density = volts/(2.0*frequency*turns*effective_area)
-  spldata = ishot?spl_hot(fp):spl_room(fp)
-  spl = specific_power_loss(spldata,flux_density,frequency)
-  loss = spl*effective_volume
-  volts^2/loss
-end
-function equivalent_parallel_resistance(t::Transformer,
-                                        volts,
-                                        frequency=center_frequency(t),
-                                        turns=1,
-                                        ishot::Bool=true)
-  equivalent_parallel_resistance(ferriteproperties(t),
-                                 volts,
-                                 frequency,
-                                 turns,
-                                 ishot)
-end
-
-"""
     chan_inductor(ferriteproperties, effective_area, effective_length,ishot=true)
     chan_inductor(transformer, ishot=true)
 
@@ -241,7 +177,7 @@ chan_inductor
 function chan_inductor(fp::FerriteProperties,
                        effective_area,effective_length,ishot::Bool=true)
   bh = ishot ? bh_hot(fp) : bh_room(fp)
-  ChanInductor(hc(bh), bs(bh), br(bh), effective_area, effective_length,0.0, 1.0)
+  ChanInductor(hc(bh), bs(bh), br(bh), effective_area, effective_length, 0.0, 1.0)
 end
 chan_inductor(t::Transformer, ishot::Bool=true) =
   chan_inductor(ferriteproperties(t),
@@ -249,4 +185,25 @@ chan_inductor(t::Transformer, ishot::Bool=true) =
                 effective_length(t),
                 ishot)
 
-leakage_inductance(volume,turns,width) = volume*μ0*(turns/width)^2
+function winding_area(cg::CoreGeometry)
+  π*(half_center_width(cg)+winding_aperture(cg))^2-π*half_center_width(cg)^2+
+  2.0*winding_aperture(cg)*center_length(cg)
+end
+winding_area(w::Windings) = core(w)
+function winding_breadth_volume(w::Windings)
+  breadth = 0.0
+  volume = 0.0
+  wa = winding_area(core(w))
+  for i in 2:length(isprimary(w))
+    if isprimary(w)[i] != isprimary(w)[i-1]
+      breadth += winding_aperture(w)
+      volume += thickness(stackup(pcb(w)))[2*(i-1)]*wa
+    end
+  end
+  (breadth, volume)
+end
+leakage_inductance(t::Transformer) = leakage_inductance(windings(t))
+function leakage_inductance(w::Windings)
+  (breadth, volume) = winding_breadth_volume(w)
+  μ0*volume*(turns(w)[1]/breadth)^2
+end
