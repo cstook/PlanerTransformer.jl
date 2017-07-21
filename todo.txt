@@ -1,0 +1,3 @@
+# fix DC winding losses for forward converter
+# fix skin effect for "double the windings" case, or disallow this case.
+ 
