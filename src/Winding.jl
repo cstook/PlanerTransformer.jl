@@ -65,7 +65,14 @@ function windings(pcb::PCB_Specification, core::CoreGeometry,
   if length(isprimary)!=div(length(pcb.stackup.material),2)+1
     throw(ArgumentError("length of isprimary must be the same as number of conductor layers"))
   end
-
+  x = 0
+  for ip in isprimary
+    x += ip ? 1 : -1
+    if abs(x)>1
+      warn("will not be analyzed correctly due to layer connections to primay and secondary")
+      break
+    end
+  end
   Windings(pcb,core,
            winding_geometry(pcb,core,primaryturnsperlayer),
            winding_geometry(pcb,core,secondaryturnsperlayer),

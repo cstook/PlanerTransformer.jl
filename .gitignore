@@ -3,6 +3,8 @@
 *.jl.mem
 *.log
 *.raw
+*.net
+*.plt
 *.lnk
 site/
 docs/build/
