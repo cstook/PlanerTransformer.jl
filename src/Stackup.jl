@@ -47,7 +47,7 @@ struct Stackup
       throw(ArgumentError("stackup must have ar least three layers"))
     end
     if mod(length(s),2) == 0
-      throw(ArgumentEror("stackup must have odd number of layers"))
+      throw(ArgumentError("stackup must have odd number of layers"))
     end
     for i in eachindex(s)
       if mod(i,2) == 0

@@ -46,6 +46,10 @@ struct BHloop
   bs :: Float64
   br :: Float64
 end
+hc(x::BHloop) = x.hc
+bs(x::BHloop) = x.bs
+br(x::BHloop) = x.br
+
 """
     SpecificPowerLossData(frequency::Tuple, mb::Tuple)
     SpecificPowerLossData(input::SplInput)

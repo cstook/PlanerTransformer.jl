@@ -1,5 +1,5 @@
 export TransformerPowerAnalysis, transformer_power_analysis
-export total_power, winding_power, r_core
+export total_power, winding_power, r_core, input_power, output_power
 
 """
     TransformerPowerAnalysis
@@ -15,6 +15,7 @@ Object to store the result of a transformer_power_analysis().
 - `current`                 -- (promary, secondary) Ipp
 - `ac_winding_resistance`   -- (primary, secondary) Ω
 - `dc_winding_resistance`   -- (primary, secondary) Ω
+- `equilivent_resistance`   -- (primary, secondary) Ω
 - `r_core`                  -- parallel resistance for spice model.
 - `core_specific_power`     -- power dissipated in core in W/m^3
 - `core_total_power`        -- power dissipated in core in W
@@ -29,8 +30,9 @@ struct TransformerPowerAnalysis
   current :: Tuple # (primary, secondary)
   ac_winding_resistance :: Tuple
   dc_winding_resistance :: Tuple
-  core_specific_power :: Float64
+  equilivent_resistance :: Tuple
   v_core  :: Float64 # volatge referenced to 1T corrected for input resistance loss
+  core_specific_power :: Float64
   core_total_power :: Float64
 end
 
@@ -43,7 +45,7 @@ Determine the losses of a transformer.
 function transformer_power_analysis(t::Transformer, c::Converter)
   n = turns(t)[2]/turns(t)[1]
   seconds = duty(c)/frequency(c)
-  r = winding_resistance(t, frequency(c))
+  r = equilivent_resistance(t,c) #winding_resistance(t, frequency(c))
   # initial conditions
   v1 = v_in(c)
   i2 = i_out(c)
@@ -71,10 +73,18 @@ function transformer_power_analysis(t::Transformer, c::Converter)
       break
     end
    end
-  v3 /= turns(t)[1] # referance v3 to 1 turn
-  TransformerPowerAnalysis(t, c, flux_density, (v1, v2), (i1, i2), r,
-      winding_resistance(t,0.0), v3, core_specific_power,
+  v3 /= turns(t)[1] # reference v3 to 1 turn
+  TransformerPowerAnalysis(t, c, flux_density, (v1, v2), (i1, i2),
+    winding_resistance(t, frequency(c)), winding_resistance(t,0.0),
+    r,
+    v3, core_specific_power,
       core_total_power)
+end
+function equilivent_resistance(t::Transformer, c::PushPull)
+  winding_resistance(t, frequency(c))
+end
+function equilivent_resistance(t::Transformer, c::Forward)
+  (1.0-duty(c)).*winding_resistance(t, frequency(c)) .+ duty(c).*winding_resistance(t, 0.0)
 end
 flux_density_voltage(c::PushPull, v3::Float64) = v3
 flux_density_voltage(c::Forward, v3::Float64) = 0.5*(v3-reset_voltage(c))
@@ -82,14 +92,15 @@ new_i1(c::PushPull, core_total_power::Float64, i2::Float64, v3::Float64, n::Floa
 new_i1(c::Forward, core_total_power::Float64, i2::Float64, v3::Float64, n::Float64) = core_total_power/(v3*duty(c)) - i2*n
 
 total_power(tpa::TransformerPowerAnalysis) = sum(winding_power(tpa)) + core_total_power(tpa)
+
 winding_power(tpa::TransformerPowerAnalysis) = winding_power(tpa, converter(tpa))
 function winding_power(tpa::TransformerPowerAnalysis, c::PushPull)
-  current(tpa).^2 .* ac_winding_resistance(tpa)
+  current(tpa).^2 .* equilivent_resistance(tpa)
 end
 function winding_power(tpa::TransformerPowerAnalysis, c::Forward)
-  (1.0-duty(c)).*(current(tpa).^2 .* ac_winding_resistance(tpa)) .+
-  duty(c).*(current(tpa).^2 .* dc_winding_resistance(tpa))
+  duty(c).*current(tpa).^2 .* equilivent_resistance(tpa)
 end
+
 r_core(tpa::TransformerPowerAnalysis) = r_core(tpa, converter(tpa))
 function r_core(tpa::TransformerPowerAnalysis, c::PushPull)
   v_core(tpa)^2/core_total_power(tpa)
@@ -103,9 +114,12 @@ end
 returns the difference between total_power and the power loss computed from the
 voltages and currents.
 """
-function power_error(ta::TransformerPowerAnalysis)
-  p_in = voltage(ta)[1]*current(ta)[1]*duty(converter(ta))
-  p_out = voltage(ta)[2]*current(ta)[2]*duty(converter(ta))
-  p_loss1 = p_in+p_out
-  total_power(ta) - p_loss1
-end
+power_error(ta::TransformerPowerAnalysis) = total_power(ta) - (input_power(ta) + output_power(ta))
+
+input_power(tpa::TransformerPowerAnalysis) = input_power(tpa, converter(tpa))
+input_power(tpa::TransformerPowerAnalysis, c::PushPull) = voltage(tpa)[1]*current(tpa)[1]
+input_power(tpa::TransformerPowerAnalysis, c::Forward) = voltage(tpa)[1]*current(tpa)[1]*duty(c)
+
+output_power(tpa::TransformerPowerAnalysis) = output_power(tpa, converter(tpa))
+output_power(tpa::TransformerPowerAnalysis, c::PushPull) = voltage(tpa)[2]*current(tpa)[2]
+output_power(tpa::TransformerPowerAnalysis, c::Forward) = voltage(tpa)[2]*current(tpa)[2]*duty(c)

@@ -7,8 +7,6 @@ function testshow(x, verified::String)
   @test String(take!(buf)) == verified
 end
 
-
-include("test_CoreGeometry.jl")
-include("test_Winding.jl")
 include("test_FerriteProperties.jl")
-include("test_TransformerDesign.jl")
+include("test_transformer_construction.jl")
+include("test_TransformerAnalysis.jl")

@@ -69,7 +69,7 @@ function windings(pcb::PCB_Specification, core::CoreGeometry,
   for ip in isprimary
     x += ip ? 1 : -1
     if abs(x)>1
-      warn("will not be analyzed correctly due to layer connections to primay and secondary")
+      throw(ArgumentError("cannot analyze due to layer connections to primay and secondary"))
       break
     end
   end
@@ -86,13 +86,13 @@ function sides(isprimary,i)::Float64
   i==1 && return 1.0
   i==length(isprimary) && return 1.0
   s = 0.0
-  isprimary[i] == isprimary[i-1] && (s+=1.0)
-  isprimary[i] == isprimary[i+1] && (s+=1.0)
+  isprimary[i] != isprimary[i-1] && (s+=1.0)
+  isprimary[i] != isprimary[i+1] && (s+=1.0)
   return s
 end
 
 effective_volume(w::Windings) = effective_volume(core(w))
 effective_area(w::Windings) = effective_area(core(w))
 effective_length(w::Windings) = effective_length(core(w))
-winding_aperature_height(w::Windings) = winding_aperature_height(core(w))
+winding_aperture_height(w::Windings) = winding_aperture_height(core(w))
 winding_aperture(w::Windings) = winding_aperture(core(w))

@@ -1,6 +1,7 @@
 __precompile__()
 
 module PlanerTransformer
+include("string_literals.jl")
 include("types.jl")
 include("TransformerAnalysis.jl")
 include("functionalize_fieldnames.jl")

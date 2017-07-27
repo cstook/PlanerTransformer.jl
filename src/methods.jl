@@ -1,6 +1,6 @@
 export flux_density, specific_power_loss
 export turns, copper_weight_to_meters, winding_resistance
-export volt_seconds_per_turn
+export volt_seconds_per_turn, volt_seconds
 export chan_inductor, leakage_inductance
 
 
@@ -107,7 +107,7 @@ volt_seconds_per_turn(effective_area, flux_density_pp) =
 volt_seconds_per_turn(cg::CoreGeometry, flux_density_pp) =
   volt_seconds_per_turn(effective_area(cg), flux_density_pp)
 volt_seconds_per_turn(w::Windings, flux_density_pp) =
-  colt_seconds_per_turn(core(w), flux_density_pp)
+  volt_seconds_per_turn(core(w), flux_density_pp)
 volt_seconds_per_turn(t::Transformer, flux_density_pp) =
   volt_seconds_per_turn(windings(t), flux_density_pp)
 
@@ -119,7 +119,7 @@ Volt seconds at `flux_density_pp`.
 volt_seconds(w::Windings, flux_density_pp) =
   volt_seconds_per_turn(core(w), flux_density_pp).*turns(w)
 volt_seconds(t::Transformer, flux_density_pp) =
-  volt_seconds_per_turn(windings(t), flux_density_pp)
+  volt_seconds(windings(t), flux_density_pp)
 
 const μ0 =4π*1e-7
 skin_depth(ρ,f)=√(ρ/(π*f*μ0)) # skin depth
@@ -177,10 +177,10 @@ chan_inductor
 function chan_inductor(fp::FerriteProperties,
                        effective_area,effective_length,ishot::Bool=true)
   bh = ishot ? bh_hot(fp) : bh_room(fp)
-  ChanInductor(hc(bh), bs(bh), br(bh), effective_area, effective_length, 0.0, 1.0)
+  ChanInductor(hc(bh_hot(fp)), bs(bh_hot(fp)), br(bh_hot(fp)), effective_area, effective_length, 0.0, 1.0)
 end
 chan_inductor(t::Transformer, ishot::Bool=true) =
-  chan_inductor(ferriteproperties(t),
+  chan_inductor(ferrite(t),
                 effective_area(t),
                 effective_length(t),
                 ishot)
