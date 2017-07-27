@@ -32,8 +32,7 @@ stackup = Stackup([copper,fr408,copper,fr408,copper,fr408,copper],
                   [outer, dielectric,inner,dielectric,inner,dielectric]))
 @test_throws(ArgumentError,  Stackup([copper,copper,fr408,fr408,copper,fr408,copper],
                   [outer, inner,dielectric,dielectric,inner,dielectric,outer]))
-@test_throws(ArgumentError,  Stackup([fr408,fr408,fr408],
-                  [dielectric,dielectric,dielectric]))
+@test_throws(ArgumentError,  Stackup([fr408,fr408,fr408], [dielectric,dielectric,dielectric]))
 
 
 pcb = PCB_Specification(trace_edge_gap,
@@ -55,8 +54,10 @@ w3 = windings(pcb, core_geometry, primaryturnsperlayer, secondaryturnsperlayer,
             prisec"S-P-S", false, true)
 @test_throws ArgumentError windings(pcb, core_geometry, primaryturnsperlayer, secondaryturnsperlayer,
             prisec"P-P-S-S", false, true)
-@test_warn("WARNING: 30 on e14_set will result in negative trace width.  Setting to NaN.",
-            windings(pcb, core_geometry, 30, secondaryturnsperlayer,prisec"S-P-P-S", false, true))
+
+@test_warn("WARNING: 31 on e14_set will result in negative trace width.  Setting to NaN.",
+  windings(pcb, core_geometry, 31, secondaryturnsperlayer,prisec"S-P-P-S", false, true))
+
 @test sides(w1) == (1.00, 1.00, 1.00, 1.00)
 @test sides(w2) == (1.00, 2.00, 2.00, 1.00)
 @test effective_volume(w1) == effective_volume(core(w1))
