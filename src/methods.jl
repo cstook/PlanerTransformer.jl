@@ -140,7 +140,7 @@ function layer_resistance(w::Windings, i, frequency=0.0, temperature=100.0)
   layer_resistance(winding_geometry, effective_thickness, ρ)
 end
 function layer_resistance_tuple(w::Windings, frequency=0.0, temperature=100.0)
-  ntuple(i->layer_resistance(w, i, frequency, temperature), eachindex(isprimary(w)))
+  ntuple(i->layer_resistance(w, i, frequency, temperature), length(isprimary(w)))
 end
 """
     winding_resistance(w::Windings, frequency=0.0, temperature=100.0)
@@ -155,7 +155,7 @@ function winding_resistance(w::Windings, frequency=0.0, temperature=100.0)
     if isprimary(w)[i]
       primary += isprimaryseries(w) ? x : 1/x
     else
-      secondary = issecondaryseries(w) ? x : 1/x
+      secondary += issecondaryseries(w) ? x : 1/x
     end
   end
   (isprimaryseries(w) ? primary : 1/primary, issecondaryseries(w) ? secondary : 1/secondary)

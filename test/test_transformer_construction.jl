@@ -68,12 +68,12 @@ t3 = Transformer(ferrite, w3)
 @test volt_seconds(t2, 150e3) == (17.4, 2.175)
 @test volt_seconds(t3, 150e3) == (8.7, 4.35)
 @test PlanerTransformer.skin_depth(1.0,1e6)≈0.5032921210448703
-@test winding_resistance(t1, 10e6, 100.0) == (0.2219529543698069, 0.008099901003741382)
-@test winding_resistance(t2, 10e6, 100.0) == (0.18581080298513264, 0.005461973978986992)
-@test winding_resistance(t3, 10e6, 100.0) == (0.044695193801413506, 0.005461973978986992)
-@test winding_resistance(t1, 10e6, 0.0) == (0.18635546048254428, 0.00680081409910075)
-@test winding_resistance(t1, 0.0, 0.0) == (0.10550990477236814, 0.0019252273212512366)
-@test winding_resistance(t2, 0.0, 0.0) == (0.0791324285792761, 0.003850454642502473)
+@test winding_resistance(t1, 10e6, 100.0) == (0.2219529543698069, 0.004049950501870691)
+@test winding_resistance(t2, 10e6, 100.0) == (0.18581080298513264, 0.00326219262241758)
+@test winding_resistance(t3, 10e6, 100.0) == (0.044695193801413506, 0.013561874982728374)
+@test winding_resistance(t1, 10e6, 0.0) == (0.18635546048254428, 0.003400407049550375)
+@test winding_resistance(t1, 0.0, 0.0) == (0.10550990477236814, 0.0009626136606256183)
+@test winding_resistance(t2, 0.0, 0.0) == (0.0791324285792761, 0.0012834848808341579)
 @test PlanerTransformer.center_frequency(t1) == 1.5e6
 testshow(chan_inductor(t1),"Hc=50.0, Bs=0.345, Br=0.14, A=1.45e-5, Lm=0.0207, Lg=0.0, N=1.0\n")
 @test leakage_inductance(t1) ≈ 1.1175951096599809e-7
