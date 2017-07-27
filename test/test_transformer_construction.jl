@@ -25,6 +25,17 @@ inner = copper_weight_to_meters(1.0)
 dielectric = (1.6e-3-2*outer-2*inner)/4
 stackup = Stackup([copper,fr408,copper,fr408,copper,fr408,copper],
                   [outer,dielectric,inner,dielectric,inner,dielectric,outer])
+@test_throws(ArgumentError,  Stackup([copper,fr408,copper,fr408,copper,fr408,copper],
+                  [dielectric,inner,dielectric,inner,dielectric,outer]))
+@test_throws(ArgumentError,  Stackup([copper,fr408], [outer, dielectric]))
+@test_throws(ArgumentError,  Stackup([copper,fr408,copper,fr408,copper,fr408],
+                  [outer, dielectric,inner,dielectric,inner,dielectric]))
+@test_throws(ArgumentError,  Stackup([copper,copper,fr408,fr408,copper,fr408,copper],
+                  [outer, inner,dielectric,dielectric,inner,dielectric,outer]))
+@test_throws(ArgumentError,  Stackup([fr408,fr408,fr408],
+                  [dielectric,dielectric,dielectric]))
+
+
 pcb = PCB_Specification(trace_edge_gap,
                         trace_trace_gap,
                         stackup)

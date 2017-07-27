@@ -44,7 +44,7 @@ struct Stackup
       throw(ArgumentError("length of material and thickness must match"))
     end
     if length(s) < 3
-      throw(ArgumentError("stackup must have ar least three layers"))
+      throw(ArgumentError("stackup must have at least three layers"))
     end
     if mod(length(s),2) == 0
       throw(ArgumentError("stackup must have odd number of layers"))
@@ -63,6 +63,6 @@ struct Stackup
     new(s,t)
   end
 end
-function Stackup(s::Vector{LayerMaterial}, t::Vector)
+function Stackup{T<:LayerMaterial}(s::Vector{T}, t::Vector)
   Stackup(ntuple(x->s[x],length(s)), ntuple(x->t[x],length(t)))
 end

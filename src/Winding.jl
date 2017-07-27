@@ -70,7 +70,6 @@ function windings(pcb::PCB_Specification, core::CoreGeometry,
     x += ip ? 1 : -1
     if abs(x)>1
       throw(ArgumentError("cannot analyze due to layer connections to primay and secondary"))
-      break
     end
   end
   Windings(pcb,core,
