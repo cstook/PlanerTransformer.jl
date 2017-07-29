@@ -1,8 +1,10 @@
 export PushPull, Forward
 
 abstract type Converter end
+v_in(::Converter) = NaN
+i_out(::Converter) = NaN
+frequency(::Converter) = NaN
 duty(::Converter) = NaN
-reset_voltage(::Converter) = NaN
 
 struct PushPull <: Converter
   v_in :: Float64
@@ -25,23 +27,14 @@ struct Forward <: Converter
   i_out :: Float64
   frequency :: Float64
   duty :: Float64
-  reset_voltage :: Float64
-  function Forward(v_in, i_out, frequency, duty=0.50, reset_voltage = -1.5*v_in*duty/(1.0-duty))
+  function Forward(v_in, i_out, frequency, duty=0.50)
     v_in < 0.0 && throw(ArgumentError("v_in must be positive."))
     i_out > 0.0 && throw(ArgumentError("i_out must be negative"))
     frequency < 0.0 && throw(ArgumentError("frequency must be positive"))
-    max_reset_voltage = -v_in*duty/(1.0-duty)
-    if reset_voltage > max_reset_voltage
-      throw(ArgumentError("reset voltage must be less than $max_reset_voltage for core reset"))
-    end
-    new(v_in, i_out, frequency, duty, reset_voltage)
+    new(v_in, i_out, frequency, duty)
   end
 end
 v_in(x::Forward) = x.v_in
 i_out(x::Forward) = x.i_out
 frequency(x::Forward) = x.frequency
 duty(x::Forward) = x.duty
-reset_voltage(x::Forward) = x.reset_voltage
-
-
-Forward(5,-1,1e6, 0.79)

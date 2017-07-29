@@ -15,8 +15,6 @@ vspt_r = volt_seconds_per_turn(core, flux_density_max_pp_r)
 max_vo_3f35 = vspt_3f35 * frequency
 max_vo_r = vspt_r * frequency
 
-best_material = ferrite_dict["3f35"] #
-
 # Forward converter windings
 
 trace_edge_gap = 0.5e-3
@@ -38,15 +36,25 @@ my_windings = windings(pcb, core,
                     is_layer_primary,
                     are_primary_layers_in_series,
                     are_secondary_layers_in_series)
+max_volts = frequency.*volt_seconds(my_windings,flux_density_max_pp_3f35)
 
-transformer_3f35 = Transformer(ferrite_dict["3f35"], my_windings)
-transformer_r = Transformer(ferrite_dict["r"], my_windings)
+transformer_3f35_2layer = Transformer(ferrite_dict["3f35"], my_windings)
 
 v_in = 48.0
 i_out = -7.0
-
+duty = 0.75
+reset_voltage = v_in*duty/(1.0-duty)
 # need to fix copper loss for forward converter
-tpa = transformer_power_analysis(transformer_3f35, Forward(), v_in, i_out, frequency)
+tpa = transformer_power_analysis(transformer_3f35_2layer, Forward(v_in, i_out, frequency, duty))
+turns(tpa)
+voltage(tpa)
+current(tpa)
+input_power(tpa)
+output_power(tpa)
+equilivent_resistance(tpa)
+core_total_power(tpa)
+winding_power(tpa)
+
 
 # Double the Windings
 

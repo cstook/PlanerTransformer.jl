@@ -62,7 +62,7 @@ function transformer_power_analysis(t::Transformer, c::Converter)
     v3 = v3>0.0 ? v3 : 0.0 # avoid log of negative number. unlikely? delete line?
     v2 = n*v3 + i2*r[2]
     # estimate average core power dissipation
-    flux_density = flux_density_voltage(c,v3)*seconds/(turns(t)[1]*effective_area(t))
+    flux_density = v3*seconds/(2.0*turns(t)[1]*effective_area(t)) # fix it one more time
     core_specific_power = specific_power_loss(t, flux_density, frequency(c))
     core_total_power = effective_volume(t) * core_specific_power
     # estimate i1
@@ -86,8 +86,6 @@ end
 function equilivent_resistance(t::Transformer, c::Forward)
   (1.0-duty(c)).*winding_resistance(t, frequency(c)) .+ duty(c).*winding_resistance(t, 0.0)
 end
-flux_density_voltage(c::PushPull, v3::Float64) = v3
-flux_density_voltage(c::Forward, v3::Float64) = 0.5*(v3-reset_voltage(c))
 new_i1(c::PushPull, core_total_power::Float64, i2::Float64, v3::Float64, n::Float64) = core_total_power/v3 - i2*n
 new_i1(c::Forward, core_total_power::Float64, i2::Float64, v3::Float64, n::Float64) = core_total_power/(v3*duty(c)) - i2*n
 
@@ -123,3 +121,5 @@ input_power(tpa::TransformerPowerAnalysis, c::Forward) = voltage(tpa)[1]*current
 output_power(tpa::TransformerPowerAnalysis) = output_power(tpa, converter(tpa))
 output_power(tpa::TransformerPowerAnalysis, c::PushPull) = voltage(tpa)[2]*current(tpa)[2]
 output_power(tpa::TransformerPowerAnalysis, c::Forward) = voltage(tpa)[2]*current(tpa)[2]*duty(c)
+
+turns(tpa::TransformerPowerAnalysis) = turns(transformer(tpa))
