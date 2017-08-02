@@ -3,18 +3,25 @@ export WindingGeometry, Windings, windings, winding_geometry
 """
     WindingGeometry
 
-2D representation of winding.
+2D representation of one layer of a winding.
 
 **Fields**
 - `width`   -- width of trace (m)
 - `length`  -- length of trace (m)
 - `turns`   -- number of turns
+
+`WindingGeometry` objects are typicaly created with `winding_geometry`
 """
 struct WindingGeometry
   width :: Float64
   length :: Float64
   turns :: Int
 end
+"""
+    winding_geometry(pcb, core, turns)
+
+Create a `WindingGeometry` object.
+"""
 function winding_geometry(pcb :: PCB_Specification,
                           core :: CoreGeometry,
                           turns :: Int)
@@ -43,9 +50,11 @@ end
 - `primarywindinggeometry`  -- `WindingGeometry` for all layers of primary
 - `secondarywindinggeometry`-- `WindingGeometry` for all layers of secondary
 - `isprimary`               -- tuple of `Bool` for each conductor layer
-- `sides`                   --
+- `sides`                   -- for internal use
 - `isprimaryseries`         -- true if primary is connected in series
 - `issecondaryseries`       -- true if secondary is connected in series
+
+Create `Windings` objects with `windings`.
 """
 struct Windings
   pcb :: PCB_Specification
@@ -57,7 +66,14 @@ struct Windings
   isprimaryseries :: Bool
   issecondaryseries :: Bool
 end
+"""
+    windings(pcb, core,
+            primaryturnsperlayer, secondaryturnsperlayer,
+            isprimary,
+            isprimaryeries, issecondaryseries)
 
+Create a `Windings` object.
+"""
 function windings(pcb::PCB_Specification, core::CoreGeometry,
                   primaryturnsperlayer::Int, secondaryturnsperlayer::Int,
                   isprimary,
@@ -80,7 +96,15 @@ function windings(pcb::PCB_Specification, core::CoreGeometry,
            isprimaryeries, issecondaryseries
           )
 end
+"""
+    sides(isprimary,index)
 
+For a given layer (index), returns the number (1 or 2) of sides which are part
+of the same winding.
+
+This function is for internal use calculating effective_resistance and
+ leakage_inductance.
+"""
 function sides(isprimary,i)::Float64
   i==1 && return 1.0
   i==length(isprimary) && return 1.0

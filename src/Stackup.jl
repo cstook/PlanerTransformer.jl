@@ -1,13 +1,28 @@
 export LayerMaterial, Conductor, Dielectric, Stackup
 export copper, fr408
 
+"""
+    LayerMaterial
 
+Subtypes of `LayerMaterial` hold the material properties for the layers of the
+PCB.
+"""
 abstract type LayerMaterial end
 name(::LayerMaterial) = ""
 ρ_20(::LayerMaterial) = NaN
 tc(::LayerMaterial) = NaN
 ϵ(::LayerMaterial) = NaN
 
+"""
+    Conductor(name, ρ, tc)
+
+**Fields**
+- `name`  -- name of the material
+- `ρ_20`  -- conductivity at 20C
+- `tc`    -- temperature coefficient
+
+see constant `copper` as example.
+"""
 struct Conductor <: LayerMaterial
   name  :: String
   ρ_20  :: Float64
@@ -16,14 +31,19 @@ end
 conductivity(c::Conductor, temperature) = conductivity(c.ρ_20,c.tc,temperature)
 const copper = Conductor("copper",1.68e-8, 0.003862) # (Ωm, 1/K)
 
-const ϵ0 = 8.854187817e-12
+"""
+    Dielectric(name, ϵ)
+
+**Fields**
+- `name`    -- name of the material
+- `ϵ`       -- permittivity
+"""
 struct Dielectric <: LayerMaterial
   name :: String
   ϵ    :: Float64
 end
+const ϵ0 = 8.854187817e-12
 const fr408 = Dielectric("fr408",3.67*ϵ0)
-
-
 
 """
     Stackup(material,thickness)

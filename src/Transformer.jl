@@ -1,5 +1,12 @@
 export Transformer
 
+"""
+    Transformer(ferrite, windings)
+
+**Fields**
+- `ferrite`   -- `FerriteProperties` object
+- `windings`  -- `Windings` object
+"""
 struct Transformer
   ferrite :: FerriteProperties
   windings :: Windings

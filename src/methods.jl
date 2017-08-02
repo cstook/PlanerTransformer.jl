@@ -21,6 +21,7 @@ end
     specific_power_loss(spl::SpecificPowerLossData, flux_density, frequency)
     specific_power_loss(fp::FerriteProperties, flux_density, frequency)
     specific_power_loss(t::Transformer, flux_density, frequency)
+    specific_power_loss(tpa::TransformerPowerAnalysis)
 
 Returns specific power loss.
 """
@@ -42,12 +43,13 @@ specific_power_loss(fp::FerriteProperties, flux_density, f) =
   specific_power_loss(fp.spl_hot,flux_density,f)
 specific_power_loss(t::Transformer, flux_density::Float64, f::Float64)=
   specific_power_loss(ferrite(t),flux_density,f)
-
+specific_power_loss(tpa::TransformerPowerAnalysis) = tpa.core_specific_power
 
 """
     flux_density(spl::SpecificPowerLossData, coreloss, frequency)
     flux_density(fp::FerriteProperties, coreloss, frequency)
     flux_density(t::Transformer, coreloss, frequency)
+    flux_density(tpa::TransformerPowerAnalysis)
 
 Returns magnetic field strength in Tesla.
 """
@@ -79,11 +81,12 @@ by 35e-6 to give thickness in meters.
 copper_weight_to_meters(oz) = 35e-6*oz
 
 """
-    turns(windinggeometry::WindingGeometry)
-    turns(windings::Windings)
-    turns(transformer::Transformer)
+    turns(x :: WindingGeometry)
+    turns(x :: Windings)
+    turns(x :: Transformer)
+    turns(x :: TransformerPowerAnalysis)
 
-Number of turns, Array for `Transformer`.
+Number of turns, Tuple for objects with two windings.
 """
 function turns(w::Windings)
   primary_turns = turns(primarywindinggeometry(w))
@@ -93,12 +96,15 @@ function turns(w::Windings)
   (primary_turns, secondary_turns)
 end
 turns(t::Transformer) = turns(windings(t))
+turns(tpa::TransformerPowerAnalysis) = turns(transformer(tpa))
 
 """
     volt_seconds_per_turn(effective_area, flux_density_pp)
-    volt_seconds_per_turn(cg::CoreGeometry, flux_density_pp)
-    volt_seconds_per_turn(w::Windings, flux_density_pp)
-    volt_seconds_per_turn(t::Transformer, flux_density_pp)
+    volt_seconds_per_turn(x ::CoreGeometry, flux_density_pp)
+    volt_seconds_per_turn(x ::Windings, flux_density_pp)
+    volt_seconds_per_turn(x ::Transformer, flux_density_pp)
+    volt_seconds_per_turn(x ::TransformerPowerAnalysis, flux_density_pp)
+    volt_seconds_per_turn(x ::TransformerPowerAnalysis)
 
 Volt seconds per turn at `flux_density_pp`.  The first form is just an alias for multiply.
 """
@@ -110,9 +116,15 @@ volt_seconds_per_turn(w::Windings, flux_density_pp) =
   volt_seconds_per_turn(core(w), flux_density_pp)
 volt_seconds_per_turn(t::Transformer, flux_density_pp) =
   volt_seconds_per_turn(windings(t), flux_density_pp)
-
+volt_seconds_per_turn(tpa::TransformerPowerAnalysis, flux_density_pp)=
+  volt_seconds_per_turn(transformer(tpa), flux_density_pp)
+volt_seconds_per_turn(tpa::TransformerPowerAnalysis) =
+  volt_seconds_per_turn(transformer(tpa), flux_density(tpa))
 """
-    volt_seconds(t::Transformer, flux_density_pp)
+    volt_seconds(x :: Windings, flux_density_pp)
+    volt_seconds(x :: Transformer, flux_density_pp)
+    volt_seconds(x :: TransformerPowerAnalysis, flux_density_pp)
+    volt_seconds(x :: TransformerPowerAnalysis)
 
 Volt seconds at `flux_density_pp`.
 """
@@ -120,6 +132,10 @@ volt_seconds(w::Windings, flux_density_pp) =
   volt_seconds_per_turn(core(w), flux_density_pp).*turns(w)
 volt_seconds(t::Transformer, flux_density_pp) =
   volt_seconds(windings(t), flux_density_pp)
+volt_seconds(tpa::TransformerPowerAnalysis, flux_density_pp) =
+  volt_seconds(transformer(tpa), flux_density_pp)
+volt_seconds(tpa::TransformerPowerAnalysis) =
+  volt_seconds(transformer(tpa), flux_density(tpa))
 
 const μ0 =4π*1e-7
 skin_depth(ρ,f)=√(ρ/(π*f*μ0)) # skin depth
@@ -143,7 +159,9 @@ function layer_resistance_tuple(w::Windings, frequency=0.0, temperature=100.0)
   ntuple(i->layer_resistance(w, i, frequency, temperature), length(isprimary(w)))
 end
 """
-    winding_resistance(w::Windings, frequency=0.0, temperature=100.0)
+    winding_resistance(x :: Windings, frequency=0.0, temperature=100.0)
+    winding_resistance(x :: Transformer, frequency=0.0, temperature=100.0)
+    winding_resistance(x :: TransformerPowerAnalysis, frequency=0.0)
 
 Returns tuple `(primary_resistance, secondary_resistance)`
 """
@@ -162,13 +180,23 @@ function winding_resistance(w::Windings, frequency=0.0, temperature=100.0)
 end
 winding_resistance(t::Transformer, frequency=0.0, temperature=100.0) =
   winding_resistance(windings(t),frequency,temperature)
+winding_resistance(tpa::TransformerPowerAnalysis, frequency=0.0) =
+  winding_resistance(transformer(tpa), frequency)
 
+
+"""
+    center_frequency(x :: FerriteProperties)
+    center_frequency(x :: Transformer)
+
+Middle of the minimum and maximum recomended operating frequencys from datasheet.
+"""
 center_frequency(fp::FerriteProperties) = middle(fmin(fp),fmax(fp))
 center_frequency(t::Transformer) = center_frequency(ferrite(t))
 
 """
     chan_inductor(ferriteproperties, effective_area, effective_length,ishot=true)
     chan_inductor(transformer, ishot=true)
+    chan_inductor(transformer_power_analysis, ishot=true)
 
 Parameters for LTspice [Chan inductor](http://ltwiki.org/?title=The_Chan_model)
 to be used for magnetizing inductance.
@@ -184,12 +212,26 @@ chan_inductor(t::Transformer, ishot::Bool=true) =
                 effective_area(t),
                 effective_length(t),
                 ishot)
+chan_inductor(tpa::TransformerPowerAnalysis, ishot::Bool=true) =
+  chan_inductor(transformer(tpa), ishot)
 
+"""
+    winding_area(x)
+
+Area the windings occupy.  For internal use.
+"""
 function winding_area(cg::CoreGeometry)
   π*(half_center_width(cg)+winding_aperture(cg))^2-π*half_center_width(cg)^2+
   2.0*winding_aperture(cg)*center_length(cg)
 end
 winding_area(w::Windings) = core(w)
+winding_area(t::Transformer) = winding_area(windings(t))
+winding_area(tpa::TransformerPowerAnalysis) = winding_area(transformer(tpa))
+"""
+    winding_breadth_volume(windings)
+
+Tuple (breadth, volume).  For internal use calculating leakage inductance.
+"""
 function winding_breadth_volume(w::Windings)
   breadth = 0.0
   volume = 0.0
@@ -202,8 +244,15 @@ function winding_breadth_volume(w::Windings)
   end
   (breadth, volume)
 end
-leakage_inductance(t::Transformer) = leakage_inductance(windings(t))
+"""
+    leakage_inductance(x)
+
+Leakage inductance from volume between primary and secondary, referenced to
+primary.  Fringing fields are not taken into account.
+"""
 function leakage_inductance(w::Windings)
   (breadth, volume) = winding_breadth_volume(w)
   μ0*volume*(turns(w)[1]/breadth)^2
 end
+leakage_inductance(t::Transformer) = leakage_inductance(windings(t))
+leakage_inductance(tpa::TransformerPowerAnalysis) = leakage_inductance(tansformer(tpa))

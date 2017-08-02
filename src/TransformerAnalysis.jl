@@ -121,5 +121,3 @@ input_power(tpa::TransformerPowerAnalysis, c::Forward) = voltage(tpa)[1]*current
 output_power(tpa::TransformerPowerAnalysis) = output_power(tpa, converter(tpa))
 output_power(tpa::TransformerPowerAnalysis, c::PushPull) = voltage(tpa)[2]*current(tpa)[2]
 output_power(tpa::TransformerPowerAnalysis, c::Forward) = voltage(tpa)[2]*current(tpa)[2]*duty(c)
-
-turns(tpa::TransformerPowerAnalysis) = turns(transformer(tpa))
