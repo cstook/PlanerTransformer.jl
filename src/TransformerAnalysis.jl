@@ -1,5 +1,6 @@
 export TransformerPowerAnalysis, transformer_power_analysis
 export total_power, winding_power, r_core, input_power, output_power
+export efficiency
 
 """
     TransformerPowerAnalysis
@@ -9,18 +10,15 @@ Object to store the result of a transformer_power_analysis().
 **Fields**
 - `transformer`             -- from input
 - `converter`               -- type of converter.
-- `frequency`               -- from input
 - `flux_density`            -- peak flux density in Tesla
 - `voltage`                 -- (primary, secondary) Vpp
 - `current`                 -- (promary, secondary) Ipp
 - `ac_winding_resistance`   -- (primary, secondary) Ω
 - `dc_winding_resistance`   -- (primary, secondary) Ω
 - `equilivent_resistance`   -- (primary, secondary) Ω
-- `r_core`                  -- parallel resistance for spice model.
+- `v_core`                  -- voltage, after drop accross input resistance, referenced to 1 turn
 - `core_specific_power`     -- power dissipated in core in W/m^3
 - `core_total_power`        -- power dissipated in core in W
-- `winding_power`           -- power dissipated in each winding in W
-- `total_power`             -- winding and core losses in W
 """
 struct TransformerPowerAnalysis
   transformer :: Transformer
@@ -89,8 +87,18 @@ end
 new_i1(c::PushPull, core_total_power::Float64, i2::Float64, v3::Float64, n::Float64) = core_total_power/v3 - i2*n
 new_i1(c::Forward, core_total_power::Float64, i2::Float64, v3::Float64, n::Float64) = core_total_power/(v3*duty(c)) - i2*n
 
+"""
+    total_power(tpa::TransformerPowerAnalysis)
+
+Total power dissipation of transformer.  Sum of winding and core losses.
+"""
 total_power(tpa::TransformerPowerAnalysis) = sum(winding_power(tpa)) + core_total_power(tpa)
 
+"""
+    winding_power(tpa::TransformerPowerAnalysis)
+
+Power dissipation due to windign resistance.  Tuple (primary, secondary).
+"""
 winding_power(tpa::TransformerPowerAnalysis) = winding_power(tpa, converter(tpa))
 function winding_power(tpa::TransformerPowerAnalysis, c::PushPull)
   current(tpa).^2 .* equilivent_resistance(tpa)
@@ -99,6 +107,11 @@ function winding_power(tpa::TransformerPowerAnalysis, c::Forward)
   duty(c).*current(tpa).^2 .* equilivent_resistance(tpa)
 end
 
+"""
+    r_core(tpa::TransformerPowerAnalysis)
+
+Resistance, referenced to 1 turn, for spice model to match core power dissipation.
+"""
 r_core(tpa::TransformerPowerAnalysis) = r_core(tpa, converter(tpa))
 function r_core(tpa::TransformerPowerAnalysis, c::PushPull)
   v_core(tpa)^2/core_total_power(tpa)
@@ -114,10 +127,27 @@ voltages and currents.
 """
 power_error(ta::TransformerPowerAnalysis) = total_power(ta) - (input_power(ta) + output_power(ta))
 
+"""
+    input_power(tpa::TransformerPowerAnalysis)
+
+Average power delivered to the primary of the transformer.
+"""
 input_power(tpa::TransformerPowerAnalysis) = input_power(tpa, converter(tpa))
 input_power(tpa::TransformerPowerAnalysis, c::PushPull) = voltage(tpa)[1]*current(tpa)[1]
 input_power(tpa::TransformerPowerAnalysis, c::Forward) = voltage(tpa)[1]*current(tpa)[1]*duty(c)
 
+"""
+    output_power(tpa::TransformerPowerAnalysis)
+
+Average power from the secondary of the transformer.
+"""
 output_power(tpa::TransformerPowerAnalysis) = output_power(tpa, converter(tpa))
 output_power(tpa::TransformerPowerAnalysis, c::PushPull) = voltage(tpa)[2]*current(tpa)[2]
 output_power(tpa::TransformerPowerAnalysis, c::Forward) = voltage(tpa)[2]*current(tpa)[2]*duty(c)
+
+"""
+    efficiency(tpa::TransformerPowerAnalysis)
+
+Efficiency (-Pout/Pin) of transformer.
+"""
+efficiency(tpa::TransformerPowerAnalysis) = -output_power(tpa)/input_power(tpa)

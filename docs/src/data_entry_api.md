@@ -8,5 +8,4 @@ BHloop
 SpecificPowerLossData
 PlanerTransformer.SplInput
 PlanerTransformer.Magnetics_ER_Input
-PlanerTransformer.Magnetics_I_Input
 ```
