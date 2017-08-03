@@ -19,6 +19,9 @@ windings
 WindingGeometry
 winding_resistance
 turns
+capacitance
+leakage_inductance
+does_pcb_fit
 ```
 ## Transformer
 ```@docs
@@ -27,8 +30,6 @@ volt_seconds_per_turn
 volt_seconds
 flux_density
 specific_power_loss
-leakage_inductance
-does_pcb_fit
 ```
 ## Analysis
 ```@docs

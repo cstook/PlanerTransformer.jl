@@ -46,6 +46,7 @@ c2 = Forward(v_in, i_out, frequency, duty)
 @test_throws ArgumentError Forward(v_in, -i_out, -frequency, duty)
 
 a_t1c1 = transformer_power_analysis(t1,c1)
+@test capacitance(a_t1c1) ≈ 1.7949033519440568e-11
 @test PlanerTransformer.pcb_thickness(a_t1c1) ≈ 0.0016000000000000003
 @test flux_density(a_t1c1) ≈ 0.0031908618912421674
 @test voltage(a_t1c1) == (15.0, 1.8223502434073622)
@@ -66,6 +67,7 @@ a_t1c1 = transformer_power_analysis(t1,c1)
 @test abs(PlanerTransformer.power_error(a_t1c1))<1e-10
 
 a_t1c2 = transformer_power_analysis(t1,c2)
+@test capacitance(a_t1c2) ≈ 1.7949033519440568e-11
 @test flux_density(a_t1c2) ≈ 0.0015971423866341192
 @test voltage(a_t1c2) == (15.0, 1.8290333147449505)
 @test current(a_t1c2) == (0.875598425879627, -7.0)
@@ -85,6 +87,7 @@ a_t1c2 = transformer_power_analysis(t1,c2)
 @test abs(PlanerTransformer.power_error(a_t1c2))<1e-10
 
 a_t2c1 = transformer_power_analysis(t2,c1)
+@test capacitance(a_t2c1) ≈ 2.6923550279160852e-11
 @test flux_density(a_t2c1) ≈ 0.0031976841149601127
 @test voltage(a_t2c1) == (15.0, 1.8318214383199423)
 @test current(a_t2c1) == (0.8758678396008, -7.0)
@@ -104,6 +107,7 @@ a_t2c1 = transformer_power_analysis(t2,c1)
 @test abs(PlanerTransformer.power_error(a_t2c1))<1e-10
 
 a_t2c2 = transformer_power_analysis(t2,c2)
+@test capacitance(a_t2c2) ≈ 2.6923550279160852e-11
 @test flux_density(a_t2c2) ≈ 0.0016005825568032011
 @test voltage(a_t2c2) == (15.0, 1.8363631031362788)
 @test current(a_t2c2) == (0.8756004041874144, -7.0)
@@ -123,6 +127,7 @@ a_t2c2 = transformer_power_analysis(t2,c2)
 @test abs(PlanerTransformer.power_error(a_t2c2))<1e-10
 
 a_t3c1 = transformer_power_analysis(t3,c1)
+@test capacitance(a_t3c1) ≈ 2.6923550279160852e-11
 @test flux_density(a_t3c1) ≈ 0.006397992260147801
 @test voltage(a_t3c1) == (15.0, 7.326737896892351)
 @test current(a_t3c1) == (3.5050291347466387, -7.0)
@@ -142,6 +147,7 @@ a_t3c1 = transformer_power_analysis(t3,c1)
 @test abs(PlanerTransformer.power_error(a_t3c1))<1e-10
 
 a_t3c2 = transformer_power_analysis(t3,c2)
+@test capacitance(a_t3c2) ≈ 2.6923550279160852e-11
 @test flux_density(a_t3c2) ≈ 0.0032027392435911095
 @test voltage(a_t3c2) == (15.0, 7.34481751977721)
 @test current(a_t3c2) == (3.503479779660588, -7.0)

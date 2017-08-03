@@ -1,7 +1,7 @@
 export flux_density, specific_power_loss
 export turns, copper_weight_to_meters, winding_resistance
 export volt_seconds_per_turn, volt_seconds
-export chan_inductor, leakage_inductance
+export chan_inductor, leakage_inductance, capacitance
 
 
 function interpolate_third_point(x1,y1,x2,y2, x3)
@@ -224,7 +224,7 @@ function winding_area(cg::CoreGeometry)
   π*(half_center_width(cg)+winding_aperture(cg))^2-π*half_center_width(cg)^2+
   2.0*winding_aperture(cg)*center_length(cg)
 end
-winding_area(w::Windings) = core(w)
+winding_area(w::Windings) = winding_area(core(w))
 winding_area(t::Transformer) = winding_area(windings(t))
 winding_area(tpa::TransformerPowerAnalysis) = winding_area(transformer(tpa))
 """
@@ -256,6 +256,27 @@ function leakage_inductance(w::Windings)
 end
 leakage_inductance(t::Transformer) = leakage_inductance(windings(t))
 leakage_inductance(tpa::TransformerPowerAnalysis) = leakage_inductance(transformer(tpa))
+
+"""
+    capacitance(x)
+
+Capacitance between primary and secondary.
+"""
+function capacitance(w::Windings)
+  a = winding_area(w)
+  c = 0.0
+  thick = thickness(stackup(pcb(w)))
+  mat = material(stackup(pcb(w)))
+  for i in 2:length(isprimary(w))
+    if isprimary(w)[i] != isprimary(w)[i-1]
+      c += ϵ(mat[2*(i-1)])*a/thick[2*(i-1)]
+    end
+  end
+  return c
+end
+capacitance(t::Transformer) = capacitance(windings(t))
+capacitance(tpa::TransformerPowerAnalysis) = capacitance(transformer(tpa))
+
 
 """
     pcb_thickness(x)

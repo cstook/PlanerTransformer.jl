@@ -151,3 +151,6 @@ output_power(tpa::TransformerPowerAnalysis, c::Forward) = voltage(tpa)[2]*curren
 Efficiency (-Pout/Pin) of transformer.
 """
 efficiency(tpa::TransformerPowerAnalysis) = -output_power(tpa)/input_power(tpa)
+
+core_name(tpa::TransformerPowerAnalysis) = core_name(transformer(tpa))
+ferrite_name(tpa::TransformerPowerAnalysis) = ferrite_name(transformer(tpa))

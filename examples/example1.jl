@@ -14,7 +14,7 @@ trace_trace_gap = 0.13e-3
 outer = copper_weight_to_meters(1.0)
 inner = copper_weight_to_meters(1.0)
 number_of_layers = 4
-dielectric = (1.6e-3-2*outer-2*inner)/4
+dielectric = (1.6e-3-2*outer-2*inner)/(number_of_layers-1)
 
 stackup = Stackup([copper,fr408,copper,fr408,copper,fr408,copper],
                   [outer,dielectric,inner,dielectric,inner,dielectric,outer])
@@ -32,15 +32,27 @@ my_ferrites = getindex.(ferrite_dict,my_ferrite_list)
 
 # 1 to 10 turns per layer
 turns_per_layer = 1:10
-my_windings = [windings(pcb,x,y,y,(true,false,false,true),false,false) for x in my_cores, y in turns_per_layer]
+my_windings = [windings(pcb,x,y,y,prisec"P-S-S-P",false,false) for x in my_cores, y in turns_per_layer]
 
 # create transformers for all conbinations
 my_transformers = [Transformer(f,w) for f in my_ferrites, w in my_windings]
 
 v_in = 20.0
-i_out = -5.0 # negative because power flows out of secondary
+i_out = -5.0 # power flows out of secondary
 frequency = 10e6
-my_analysis = transformer_power_analysis.(my_transformers, PushPull(), v_in, i_out, frequency)
+my_analysis = transformer_power_analysis.(my_transformers, PushPull(v_in, i_out, frequency))
 
 (pmin,index) = findmin(total_power.(my_analysis))
-best_transformer = my_analysis[index]
+best_analysis = my_analysis[index]
+(ferrite_name(best_analysis), core_name(best_analysis), turns(best_analysis))
+efficiency(best_analysis)
+
+
+# what is the efficiency of the smallest core
+my_analysis = transformer_power_analysis.(my_transformers[:,1,:], PushPull(v_in, i_out, frequency))
+
+(pmin,index) = findmin(total_power.(my_analysis))
+best_analysis = my_analysis[index]
+(ferrite_name(best_analysis), core_name(best_analysis), turns(best_analysis))
+efficiency(best_analysis)
+capacitance(best_analysis)
