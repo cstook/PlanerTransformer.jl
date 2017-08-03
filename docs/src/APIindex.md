@@ -1,4 +1,4 @@
 # API Index
 ```@index
-Pages = ["design_api.md", "data_entry_api.md"]
+Pages = ["design_api.md", "data_entry_api.md","internal_api.md"]
 ```

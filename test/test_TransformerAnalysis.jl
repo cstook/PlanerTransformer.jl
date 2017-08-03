@@ -4,7 +4,7 @@ trace_edge_gap = 0.16e-3
 trace_trace_gap = 0.13e-3
 outer = copper_weight_to_meters(2.0)
 inner = copper_weight_to_meters(1.0)
-dielectric = (1.6e-3-2*outer-2*inner)/4
+dielectric = (1.6e-3-2*outer-2*inner)/3
 stackup = Stackup([copper,fr408,copper,fr408,copper,fr408,copper],
                   [outer,dielectric,inner,dielectric,inner,dielectric,outer])
 pcb = PCB_Specification(trace_edge_gap,
@@ -46,6 +46,7 @@ c2 = Forward(v_in, i_out, frequency, duty)
 @test_throws ArgumentError Forward(v_in, -i_out, -frequency, duty)
 
 a_t1c1 = transformer_power_analysis(t1,c1)
+@test PlanerTransformer.pcb_thickness(a_t1c1) ≈ 0.0016000000000000003
 @test flux_density(a_t1c1) ≈ 0.0031908618912421674
 @test voltage(a_t1c1) == (15.0, 1.8223502434073622)
 @test current(a_t1c1) == (0.8758650011589507, -7.0)
@@ -60,6 +61,8 @@ a_t1c1 = transformer_power_analysis(t1,c1)
 @test r_core(a_t1c1) ≈ 267.44182331000746
 @test input_power(a_t1c1) ≈ 13.13797501738426
 @test output_power(a_t1c1) ≈ -12.756451703851535
+@test efficiency(a_t1c1) ≈ 0.9709602649549957
+@test leakage_inductance(a_t1c1) ≈ 1.4901268128799744e-7
 @test abs(PlanerTransformer.power_error(a_t1c1))<1e-10
 
 a_t1c2 = transformer_power_analysis(t1,c2)
@@ -77,6 +80,8 @@ a_t1c2 = transformer_power_analysis(t1,c2)
 @test r_core(a_t1c2) ≈ 386.99136174774026
 @test input_power(a_t1c2) ≈ 3.2834940970486013
 @test output_power(a_t1c2) ≈ -3.200808300803663
+@test efficiency(a_t1c2) ≈ 0.9748177417711026
+@test leakage_inductance(a_t1c2) ≈ 1.4901268128799744e-7
 @test abs(PlanerTransformer.power_error(a_t1c2))<1e-10
 
 a_t2c1 = transformer_power_analysis(t2,c1)
@@ -94,6 +99,8 @@ a_t2c1 = transformer_power_analysis(t2,c1)
 @test r_core(a_t2c1) ≈  267.1370356007262
 @test input_power(a_t2c1) ≈ 13.138017594011998
 @test output_power(a_t2c1) ≈ -12.822750068239596
+@test efficiency(a_t2c1) ≈ 0.9760034172951562
+@test leakage_inductance(a_t2c1) ≈ 9.934178752533162e-8
 @test abs(PlanerTransformer.power_error(a_t2c1))<1e-10
 
 a_t2c2 = transformer_power_analysis(t2,c2)
@@ -111,6 +118,8 @@ a_t2c2 = transformer_power_analysis(t2,c2)
 @test r_core(a_t2c2) ≈ 386.54705546931336
 @test input_power(a_t2c2) ≈ 3.283501515702804
 @test output_power(a_t2c2) ≈ -3.213635430488488
+@test efficiency(a_t2c2) ≈ 0.9787220791949713
+@test leakage_inductance(a_t2c2) ≈ 9.934178752533162e-8
 @test abs(PlanerTransformer.power_error(a_t2c2))<1e-10
 
 a_t3c1 = transformer_power_analysis(t3,c1)
@@ -128,6 +137,8 @@ a_t3c1 = transformer_power_analysis(t3,c1)
 @test r_core(a_t3c1) ≈  184.46689628697774
 @test input_power(a_t3c1) ≈ 52.57543702119958
 @test output_power(a_t3c1) ≈ -51.287165278246455
+@test efficiency(a_t3c1) ≈ 0.9754966992964097
+@test leakage_inductance(a_t3c1) ≈ 2.4835446881332905e-8
 @test abs(PlanerTransformer.power_error(a_t3c1))<1e-10
 
 a_t3c2 = transformer_power_analysis(t3,c2)
@@ -145,5 +156,7 @@ a_t3c2 = transformer_power_analysis(t3,c2)
 @test r_core(a_t3c2) ≈ 266.9118367352115
 @test input_power(a_t3c2) ≈ 13.138049173727206
 @test output_power(a_t3c2) ≈ -12.853430659610117
+@test efficiency(a_t3c2) ≈ 0.9783363184021069
+@test leakage_inductance(a_t3c2) ≈ 2.4835446881332905e-8
 @test abs(PlanerTransformer.power_error(a_t3c2))<1e-10
 end # testset

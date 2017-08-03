@@ -255,7 +255,7 @@ function leakage_inductance(w::Windings)
   μ0*volume*(turns(w)[1]/breadth)^2
 end
 leakage_inductance(t::Transformer) = leakage_inductance(windings(t))
-leakage_inductance(tpa::TransformerPowerAnalysis) = leakage_inductance(tansformer(tpa))
+leakage_inductance(tpa::TransformerPowerAnalysis) = leakage_inductance(transformer(tpa))
 
 """
     pcb_thickness(x)
@@ -263,6 +263,7 @@ leakage_inductance(tpa::TransformerPowerAnalysis) = leakage_inductance(tansforme
 Overall thickness of PCB.
 """
 pcb_thickness(x::Stackup) = sum(thickness(x))
-pcb_thickness(x::PCB_Specification) = pcb_thicknes(stackup(x))
-pcb_thickness(x::Windings) = pcb_thicknes(pcb(x))
-pcb_thickness(x::Transformer) = pcb_thicknes(windings(x))
+pcb_thickness(x::PCB_Specification) = pcb_thickness(stackup(x))
+pcb_thickness(x::Windings) = pcb_thickness(pcb(x))
+pcb_thickness(x::Transformer) = pcb_thickness(windings(x))
+pcb_thickness(x::TransformerPowerAnalysis) = pcb_thickness(transformer(x))

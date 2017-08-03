@@ -6,6 +6,7 @@ const PAGES = [
   "Introduction" => "introduction.md",
   "Design API" => "design_api.md",
   "Data Entry API" => "data_entry_api.md",
+  "Internal API" => "internal_api.md",
   "API index" => "APIindex.md",
 ]
 

@@ -1,39 +1,44 @@
 # Design
+
+!!! note
+    All fields of structs can be accessed as functions.
+
+## PCB
 ```@docs
-PCB_Specification
-copper_weight_to_meters
-Transformer
-turns
-winding_resistance
-volt_seconds
-chan_inductor
-specific_power_loss
-flux_density
-
-
-input_power
-Dielectric
-winding_power
-LayerMaterial
-leakage_inductance
-PlanerTransformer.pcb_thickness
-output_power
-transformer_power_analysis
-Windings
 Stackup
-WindingGeometry
-r_core
-PlanerTransformer.center_frequency
-efficiency
-total_power
-PlanerTransformer.winding_breadth_volume
-winding_geometry
-PlanerTransformer.winding_area
-PlanerTransformer.power_error
+LayerMaterial
+Dielectric
 Conductor
+copper_weight_to_meters
+PCB_Specification
+```
+## Windings
+```@docs
+Windings
 windings
-TransformerPowerAnalysis
-does_pcb_fit
-sides
+WindingGeometry
+winding_resistance
+turns
+```
+## Transformer
+```@docs
+Transformer
 volt_seconds_per_turn
+volt_seconds
+flux_density
+specific_power_loss
+leakage_inductance
+does_pcb_fit
+```
+## Analysis
+```@docs
+TransformerPowerAnalysis
+transformer_power_analysis
+winding_power
+total_power
+input_power
+output_power
+efficiency
+r_core
+chan_inductor
 ```
