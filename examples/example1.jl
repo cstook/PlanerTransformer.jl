@@ -45,14 +45,16 @@ my_analysis = transformer_power_analysis.(my_transformers, PushPull(v_in, i_out,
 (pmin,index) = findmin(total_power.(my_analysis))
 best_analysis = my_analysis[index]
 (ferrite_name(best_analysis), core_name(best_analysis), turns(best_analysis))
-efficiency(best_analysis)
-
+e = efficiency(best_analysis)
+l = leakage_inductance(best_analysis)
+c = capacitance(best_analysis)
 
 # what is the efficiency of the smallest core
-my_analysis = transformer_power_analysis.(my_transformers[:,1,:], PushPull(v_in, i_out, frequency))
+my_analysis_e14plt = transformer_power_analysis.(my_transformers[:,1,:], PushPull(v_in, i_out, frequency))
 
-(pmin,index) = findmin(total_power.(my_analysis))
-best_analysis = my_analysis[index]
-(ferrite_name(best_analysis), core_name(best_analysis), turns(best_analysis))
-efficiency(best_analysis)
-capacitance(best_analysis)
+(pmin,index) = findmin(total_power.(my_analysis_e14plt))
+best_analysis_e14plt = my_analysis_e14plt[index]
+(ferrite_name(best_analysis_e14plt), core_name(best_analysis_e14plt), turns(best_analysis_e14plt))
+e = efficiency(best_analysis_e14plt)
+l = leakage_inductance(best_analysis_e14plt)
+c = capacitance(best_analysis_e14plt)

@@ -249,6 +249,9 @@ l2 = leakage_inductance(series_transformer_3f35)
 l1 = chan_inductor(series_transformer_3f35)
 ```
 ```@example intro
+c1 = c2 = 0.5*capacitance(series_transformer_3f35)
+```
+```@example intro
 (r1, r2) = equilivent_resistance(series_tpa)
 ```
 ```@example intro
