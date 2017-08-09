@@ -85,7 +85,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Introduction",
     "title": "LTspice Model",
     "category": "section",
-    "text": "Parameters for a circuit simulation can be extracted.(n1, n2) = turns(series_transformer_3f35)l2 = leakage_inductance(series_transformer_3f35)l1 = chan_inductor(series_transformer_3f35)(r1, r2) = equilivent_resistance(series_tpa)r3 = r_core(series_tpa)(Image: LTspice transformer model)"
+    "text": "Parameters for a circuit simulation can be extracted.(n1, n2) = turns(series_transformer_3f35)l2 = leakage_inductance(series_transformer_3f35)l1 = chan_inductor(series_transformer_3f35)c1 = c2 = 0.5*capacitance(series_transformer_3f35)(r1, r2) = equilivent_resistance(series_tpa)r3 = r_core(series_tpa)(Image: LTspice transformer model)"
 },
 
 {
@@ -201,11 +201,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "design_api/#PlanerTransformer.capacitance",
+    "page": "Design API",
+    "title": "PlanerTransformer.capacitance",
+    "category": "Function",
+    "text": "capacitance(x)\n\nCapacitance between primary and secondary.\n\n\n\n"
+},
+
+{
+    "location": "design_api/#PlanerTransformer.leakage_inductance",
+    "page": "Design API",
+    "title": "PlanerTransformer.leakage_inductance",
+    "category": "Function",
+    "text": "leakage_inductance(x)\n\nLeakage inductance from volume between primary and secondary, referenced to primary.  Fringing fields are not taken into account.\n\n\n\n"
+},
+
+{
+    "location": "design_api/#PlanerTransformer.does_pcb_fit",
+    "page": "Design API",
+    "title": "PlanerTransformer.does_pcb_fit",
+    "category": "Function",
+    "text": "does_pcb_fit(t)\n\ntrue if PCB thickness is <= winding aperature height.\n\n\n\n"
+},
+
+{
     "location": "design_api/#Windings-1",
     "page": "Design API",
     "title": "Windings",
     "category": "section",
-    "text": "Windings\nwindings\nWindingGeometry\nwinding_resistance\nturns"
+    "text": "Windings\nwindings\nWindingGeometry\nwinding_resistance\nturns\ncapacitance\nleakage_inductance\ndoes_pcb_fit"
 },
 
 {
@@ -249,27 +273,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "design_api/#PlanerTransformer.leakage_inductance",
-    "page": "Design API",
-    "title": "PlanerTransformer.leakage_inductance",
-    "category": "Function",
-    "text": "leakage_inductance(x)\n\nLeakage inductance from volume between primary and secondary, referenced to primary.  Fringing fields are not taken into account.\n\n\n\n"
-},
-
-{
-    "location": "design_api/#PlanerTransformer.does_pcb_fit",
-    "page": "Design API",
-    "title": "PlanerTransformer.does_pcb_fit",
-    "category": "Function",
-    "text": "does_pcb_fit(t)\n\ntrue if PCB thickness is <= winding aperature height.\n\n\n\n"
-},
-
-{
     "location": "design_api/#Transformer-1",
     "page": "Design API",
     "title": "Transformer",
     "category": "section",
-    "text": "Transformer\nvolt_seconds_per_turn\nvolt_seconds\nflux_density\nspecific_power_loss\nleakage_inductance\ndoes_pcb_fit"
+    "text": "Transformer\nvolt_seconds_per_turn\nvolt_seconds\nflux_density\nspecific_power_loss"
 },
 
 {
