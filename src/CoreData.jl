@@ -1,5 +1,7 @@
 export core_geometry_dict
 
+# (name, aperture_height, winding_aperture, half_center_width, center_length,
+#  effective_volume, effective_area, effective_length, mass)
 
 const core_geometry_dict = Dict(
   #  Ferrocube data
@@ -13,6 +15,7 @@ const core_geometry_dict = Dict(
   "e18_plt"=>CoreGeometry("e18_plt", 2e-3, 5e-3,     2e-3,     10e-3, 800e-9, 39.5e-6, 20.3e-3, 1.7e-3+2.4e-3),
   "e22_plt"=>CoreGeometry("e22_plt", 3.2e-3, 5.9e-3,   2.5e-3,   15.8e-3, 2040e-9, 78.5e-6, 26.1e-3, 4e-3+6.5e-3),
   "e32_plt"=>CoreGeometry("e32_plt", 3.18e-3, 9.27e-3,  3.175e-3, 20.32e-3, 4560e-9, 129e-6, 35.1e-3, 10e-3+10e-3),
+  "e43_plt"=>CoreGeometry("e43_plt", 10.8e-3, 13.3e-3, 4.05e-3, 27.9e-3, 11500e-9, 229e-6, 50.4e-3, 35e-3+24e-3),
   "e58_plt"=>CoreGeometry("e58_plt", 6.5e-3, 21.4e-3,  4.05e-3,  38.1e-3, 20800e-9, 305e-6, 67.7e-3, 44e-3+62e-3),
   "e64_plt"=>CoreGeometry("e64_plt", 5.1e-3, 21.8e-3,  5.08e-3,  50.8e-3, 35500e-9, 511e-6, 69.7e-3, 78e-3+100e-3),
 
