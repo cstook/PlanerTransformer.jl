@@ -14,15 +14,15 @@ stackup = Stackup([copper,fr408,copper,fr408,copper,fr408,copper],
 my_pcb = PCB_Specification(trace_edge_gap,
                         trace_trace_gap,
                         stackup)
-turns_per_layer = 1:3
-my_windings = [windings(my_pcb, core_geometry_dict["e43_plt"],
-                        x,x,prisec"P-S-S-P",false,false) for x in turns_per_layer]
+turns_per_layer = 1:4
+my_windings = [windings(my_pcb, core_geometry_dict["e32_plt"],
+                        x,x,prisec"P-S-S-P",true,true) for x in turns_per_layer]
 material = ferrite_dict["3f4"]
 my_transformers = Transformer.(material,my_windings)
 
 frequency = linspace(fmin(material),fmax(material),100)
 v_in = 20.0
-i_out = -5.0
+i_out = -0.5
 my_converters = PushPull.(v_in, i_out, frequency)
 
 my_analysis = [transformer_power_analysis.(t,c) for t in my_transformers, c in my_converters]
