@@ -15,5 +15,3 @@ macro prisec_str(s)
   end
   (a...)
 end
-
-prisec"P-S-S-P"
