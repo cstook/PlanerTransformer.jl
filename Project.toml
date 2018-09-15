@@ -2,3 +2,7 @@ name = "PlanerTransformer"
 uuid = "4d7a3a6e-7a92-11e8-2f32-078e0e0bcb4b"
 authors = ["Chris Stook <chris@chrisstook.com>"]
 version = "0.1.0"
+
+[deps]
+Dierckx = "39dd38d3-220a-591b-8e3c-4c3a8c710a94"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

@@ -1,7 +1,7 @@
 export @prisec_str
 
 macro prisec_str(s)
-  a = Array{Bool}(0)
+  a = Array{Bool,1}()
   pos = 1
   done = false
   while ~done
@@ -13,5 +13,5 @@ macro prisec_str(s)
       done = true
     end
   end
-  (a...)
+  Tuple(a)
 end

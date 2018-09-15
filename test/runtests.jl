@@ -1,5 +1,5 @@
 using PlanerTransformer
-using Base.Test
+using Test
 
 function testshow(x, verified::String)
   buf = IOBuffer()

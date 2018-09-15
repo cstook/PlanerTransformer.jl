@@ -83,6 +83,6 @@ struct Stackup
     new(s,t)
   end
 end
-function Stackup{T<:LayerMaterial}(s::Vector{T}, t::Vector)
+function Stackup(s::Vector{T}, t::Vector) where T<:LayerMaterial
   Stackup(ntuple(x->s[x],length(s)), ntuple(x->t[x],length(t)))
 end

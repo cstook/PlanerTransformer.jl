@@ -10,11 +10,13 @@ function interpolate_third_point(x1,y1,x2,y2, x3)
   return m*x3+b
 end
 function find_nearest_spl_frequency_indices(spl::SpecificPowerLossData,f)
-  i = 2
-  for i in 2:length(spl.frequency) # there will never be many of these
-    if spl.frequency[i]>f break end
+  l = length(spl.frequency)
+  for i in 2:l # there will never be many of these
+    if spl.frequency[i]>f
+      return i-1:i
+    end
   end
-  return i-1:i
+  return l-1:l
 end
 
 """
@@ -184,13 +186,14 @@ winding_resistance(tpa::TransformerPowerAnalysis, frequency=0.0) =
   winding_resistance(transformer(tpa), frequency)
 
 
+
 """
     center_frequency(x :: FerriteProperties)
     center_frequency(x :: Transformer)
 
 Middle of the minimum and maximum recomended operating frequencys from datasheet.
 """
-center_frequency(fp::FerriteProperties) = middle(fmin(fp),fmax(fp))
+center_frequency(fp::FerriteProperties) = (fmin(fp)+fmax(fp))/2.0
 center_frequency(t::Transformer) = center_frequency(ferrite(t))
 
 """
