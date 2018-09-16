@@ -73,9 +73,7 @@ uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[PlanerTransformer]]
 deps = ["Dierckx", "Test"]
-git-tree-sha1 = "d4dd9e5381b23146b3d831e073ed61bdd01a551f"
-repo-rev = "master"
-repo-url = ".."
+path = ".."
 uuid = "4d7a3a6e-7a92-11e8-2f32-078e0e0bcb4b"
 version = "0.1.0"
 
