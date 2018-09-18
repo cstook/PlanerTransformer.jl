@@ -1,12 +1,6 @@
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
-[[BinaryProvider]]
-deps = ["Libdl", "Pkg", "SHA", "Test"]
-git-tree-sha1 = "b530fbeb6f41ab5a83fbe3db1fcbe879334bcd2d"
-uuid = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
-version = "0.4.2"
-
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
 git-tree-sha1 = "ae262fa91da6a74e8937add6b613f58cd56cdad4"
@@ -20,12 +14,6 @@ uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 [[DelimitedFiles]]
 deps = ["Mmap"]
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
-
-[[Dierckx]]
-deps = ["BinaryProvider", "Libdl", "Random", "Test"]
-git-tree-sha1 = "7905f89a2beef5564c62fdf7aad1d0ef68b13239"
-uuid = "39dd38d3-220a-591b-8e3c-4c3a8c710a94"
-version = "0.4.0"
 
 [[Distributed]]
 deps = ["LinearAlgebra", "Random", "Serialization", "Sockets"]
@@ -72,9 +60,11 @@ deps = ["Dates", "LibGit2", "Markdown", "Printf", "REPL", "Random", "SHA", "UUID
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[PlanerTransformer]]
-deps = ["Dierckx", "Test"]
-path = ".."
+git-tree-sha1 = "c178d7a447655e8bc4854bd2e13f718dae351bcb"
+repo-rev = "master"
+repo-url = ".."
 uuid = "4d7a3a6e-7a92-11e8-2f32-078e0e0bcb4b"
+version = "0.1.0"
 
 [[Printf]]
 deps = ["Unicode"]
