@@ -29,7 +29,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Installation",
     "title": "Installation",
     "category": "section",
-    "text": "PlanerTransformer is currently unregistered.  It can be installed using Pkg.clone.Pkg.clone(\"https://github.com/cstook/PlanerTransformer.jl.git\")The julia documentation section on installing unregistered packages provides more information.PlanerTransformer is compatible with julia v0.6."
+    "text": "PlanerTransformer is currently unregistered.  It can be installed using Pkg.clone.Pkg.clone(\"https://github.com/cstook/PlanerTransformer.jl.git\")The julia documentation section on installing unregistered packages provides more information.PlanerTransformer is compatible with julia v1.0."
 },
 
 {
