@@ -14,8 +14,8 @@ matrix:
   - julia: nightly
 
 after_success:
-  - julia --project=coverage/ -e 'using Pkg; Pkg.instantiate()'
-  - julia --project=coverage/ coverage/coverage.jl
+  - julia --project=test/coverage/ -e 'using Pkg; Pkg.instantiate()'
+  - julia --project=test/coverage/ test/coverage/coverage.jl
 
 
   # push coverage results to Coveralls
@@ -36,7 +36,7 @@ jobs:
       os: linux
       script:
         - julia --project=docs -e 'using Pkg; Pkg.instantiate()'
-        - julia --project=docs docs/make.jl deploy
+        - julia --project=docs --color=yes docs/make.jl deploy
       after_success: skip
 
 notifications:
